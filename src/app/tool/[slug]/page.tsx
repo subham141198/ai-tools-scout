@@ -3,18 +3,51 @@ import { Navbar } from "@/components/Navbar";
 import { AdPlacement } from "@/components/AdPlacement";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, ExternalLink, ArrowLeft, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import { Star, ExternalLink, ArrowLeft, CheckCircle2, AlertCircle, Sparkles, Globe } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { notFound } from "next/navigation";
 import { ToolCard } from "@/components/ToolCard";
+import { aiToolDetails } from "@/ai/flows/ai-tool-details-flow";
+import { AITool } from "@/lib/types";
 
-export default async function ToolDetailPage({ params }: { params: { slug: string } }) {
-  const tool = await getToolBySlug(params.slug);
+export default async function ToolDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
+  // Try local DB first
+  let toolData = await getToolBySlug(slug);
+  let isAiGenerated = false;
+
+  // If not in DB, it's likely a global tool from AI search
+  if (!toolData) {
+    try {
+      const aiResult = await aiToolDetails({ slug });
+      toolData = {
+        ...aiResult,
+        id: slug,
+        slug: slug,
+        featured: false,
+        approved: true,
+        createdAt: new Date().toISOString(),
+      } as AITool;
+      isAiGenerated = true;
+    } catch (error) {
+      console.error("Failed to fetch tool details from AI:", error);
+    }
+  }
+
   const similarTools = await getTrendingTools();
 
-  if (!tool) {
-    notFound();
+  if (!toolData) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <main className="flex-1 container mx-auto px-4 py-20 text-center">
+          <h1 className="text-4xl font-black mb-4">Tool Not Found</h1>
+          <p className="text-muted-foreground mb-8">We couldn't find details for "{slug}". It might be too new or private.</p>
+          <Button asChild><Link href="/">Return to Directory</Link></Button>
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -27,6 +60,15 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
           Back to Directory
         </Link>
 
+        {isAiGenerated && (
+          <div className="mb-8 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+            <Globe className="h-5 w-5 shrink-0" />
+            <p className="text-sm font-medium">
+              This profile was generated in real-time by <strong>AI Tool Scout Intelligence</strong> as it's not currently in our local verified directory.
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Main Content */}
           <div className="lg:col-span-8 space-y-10">
@@ -34,28 +76,28 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
             <section className="bg-card rounded-3xl p-8 border shadow-sm relative overflow-hidden">
                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none" />
                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-white shadow-xl bg-white shrink-0">
-                    <Image src={tool.logoUrl} alt={tool.name} fill className="object-cover" />
+                  <div className="relative w-32 h-32 rounded-3xl overflow-hidden border-4 border-white shadow-xl bg-white shrink-0">
+                    <Image src={toolData.logoUrl} alt={toolData.name} fill className="object-cover" />
                   </div>
                   <div className="space-y-4 flex-1">
                     <div className="flex flex-wrap items-center gap-3">
-                      <h1 className="text-3xl md:text-4xl font-headline font-black">{tool.name}</h1>
-                      <Badge variant="secondary" className="bg-primary/10 text-primary border-none">{tool.pricingModel}</Badge>
-                      <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 px-2 py-1 rounded-lg">
+                      <h1 className="text-3xl md:text-5xl font-headline font-black tracking-tight">{toolData.name}</h1>
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-sm px-3">{toolData.pricingModel}</Badge>
+                      <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 px-3 py-1 rounded-xl border border-amber-100">
                         <Star className="h-4 w-4 fill-current" />
-                        {tool.rating}
+                        {toolData.rating}
                       </div>
                     </div>
-                    <p className="text-xl text-muted-foreground font-medium">{tool.tagline}</p>
-                    <div className="flex flex-wrap gap-4 pt-2">
-                      <Button className="rounded-full px-8 bg-primary shadow-lg shadow-primary/20" asChild>
-                        <a href={tool.websiteUrl} target="_blank" rel="noopener noreferrer" className="gap-2">
-                          Visit Website
+                    <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-tight">{toolData.tagline}</p>
+                    <div className="flex flex-wrap gap-4 pt-4">
+                      <Button size="lg" className="rounded-full px-10 bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-transform" asChild>
+                        <a href={toolData.websiteUrl} target="_blank" rel="noopener noreferrer" className="gap-2">
+                          Explore Tool
                           <ExternalLink className="h-4 w-4" />
                         </a>
                       </Button>
-                      <Button variant="outline" className="rounded-full px-8" asChild>
-                        <Link href={`/compare?tools=${tool.slug}`}>Compare with Alternatives</Link>
+                      <Button size="lg" variant="outline" className="rounded-full px-8" asChild>
+                        <Link href={`/compare?tools=${toolData.slug}`}>Compare Engine</Link>
                       </Button>
                     </div>
                   </div>
@@ -67,51 +109,66 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
             {/* Description & Details */}
             <div className="space-y-8 prose prose-slate max-w-none">
               <section className="bg-card rounded-2xl p-8 border shadow-sm">
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                  Product Overview
-                </h2>
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Sparkles className="h-6 w-6 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-bold m-0">In-Depth Analysis</h2>
+                </div>
                 <div className="text-lg leading-relaxed text-muted-foreground whitespace-pre-line">
-                  {tool.description}
-                  {/* Mocking the 800-word requirement with extra detailed content sections */}
-                  <div className="mt-8 space-y-6 text-base">
-                    <h3 className="text-foreground text-xl font-bold">What is {tool.name}?</h3>
-                    <p>In the rapidly evolving landscape of artificial intelligence, {tool.name} stands out as a pioneering solution designed to address complex workflows within the {tool.workCategories[0]} domain. By leveraging advanced machine learning algorithms, this tool provides users with unprecedented capabilities to automate repetitive tasks and unlock new levels of creative and analytical potential.</p>
-                    
-                    <h3 className="text-foreground text-xl font-bold">Key Features & Functionalities</h3>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0">
-                      {tool.features.map((feature, i) => (
-                        <li key={i} className="flex gap-2 items-start bg-muted/30 p-4 rounded-xl">
-                          <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                          <span className="font-medium text-foreground">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  {toolData.description}
+                  
+                  <div className="mt-12 space-y-8 text-base">
+                    <div className="bg-muted/30 rounded-2xl p-8 border">
+                      <h3 className="text-foreground text-xl font-bold mb-4">Core Capabilities</h3>
+                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0">
+                        {toolData.features.map((feature, i) => (
+                          <li key={i} className="flex gap-3 items-start bg-background border p-4 rounded-xl shadow-sm">
+                            <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                            <span className="font-semibold text-foreground">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-                    <h3 className="text-foreground text-xl font-bold">Pros and Cons</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="bg-emerald-50/50 border border-emerald-100 p-6 rounded-2xl">
-                        <h4 className="font-bold text-emerald-700 mb-4 flex items-center gap-2">
-                          <CheckCircle2 className="h-5 w-5" />
-                          The Good
+                      <div className="bg-emerald-50/50 border border-emerald-100 p-8 rounded-3xl">
+                        <h4 className="font-bold text-emerald-800 text-lg mb-4 flex items-center gap-2">
+                          <CheckCircle2 className="h-6 w-6" />
+                          The Advantages
                         </h4>
-                        <ul className="space-y-2 list-disc list-inside text-emerald-900/80">
-                          {tool.pros.map((pro, i) => <li key={i}>{pro}</li>)}
+                        <ul className="space-y-3 list-none p-0 text-emerald-900/80">
+                          {toolData.pros.map((pro, i) => (
+                            <li key={i} className="flex gap-2 items-start italic">
+                              <span className="text-emerald-500 font-bold">•</span>
+                              {pro}
+                            </li>
+                          ))}
                         </ul>
                       </div>
-                      <div className="bg-rose-50/50 border border-rose-100 p-6 rounded-2xl">
-                        <h4 className="font-bold text-rose-700 mb-4 flex items-center gap-2">
-                          <AlertCircle className="h-5 w-5" />
-                          The Challenges
+                      <div className="bg-rose-50/50 border border-rose-100 p-8 rounded-3xl">
+                        <h4 className="font-bold text-rose-800 text-lg mb-4 flex items-center gap-2">
+                          <AlertCircle className="h-6 w-6" />
+                          The Constraints
                         </h4>
-                        <ul className="space-y-2 list-disc list-inside text-rose-900/80">
-                          {tool.cons.map((con, i) => <li key={i}>{con}</li>)}
+                        <ul className="space-y-3 list-none p-0 text-rose-900/80">
+                          {toolData.cons.map((con, i) => (
+                            <li key={i} className="flex gap-2 items-start italic">
+                              <span className="text-rose-400 font-bold">•</span>
+                              {con}
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     </div>
 
-                    <h3 className="text-foreground text-xl font-bold">Final Verdict</h3>
-                    <p>Whether you're a seasoned professional or a growing team, {tool.name} offers a compelling set of tools that are likely to significantly impact your output quality and efficiency. While the {tool.pricingModel} pricing model might require some evaluation, the return on investment through time saved and capabilities gained makes it a top recommendation in our AI directory.</p>
+                    <div className="pt-8 border-t">
+                      <h3 className="text-foreground text-xl font-bold mb-4">Professional Verdict</h3>
+                      <p className="italic leading-relaxed">
+                        Based on our {isAiGenerated ? 'AI research' : 'editorial review'}, {toolData.name} is a high-impact solution for professionals working in {toolData.workCategories.join(' and ')}. 
+                        Its {toolData.pricingModel} model offers flexibility for teams of various sizes. We recommend it for users specifically looking for {toolData.features[0].toLowerCase()} and {toolData.features[1].toLowerCase()}.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -121,9 +178,11 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
             
             {/* Similar Tools */}
             <section className="py-10">
-              <h2 className="text-2xl font-bold mb-8">Similar Tools to Consider</h2>
+              <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+                Discover More Alternatives
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {similarTools.filter(t => t.slug !== tool.slug).slice(0, 2).map(t => (
+                {similarTools.filter(t => t.slug !== toolData.slug).slice(0, 2).map(t => (
                   <ToolCard key={t.id} tool={t} />
                 ))}
               </div>
@@ -132,44 +191,44 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
 
           {/* Sidebar */}
           <aside className="lg:col-span-4 space-y-8">
-            <div className="bg-card border rounded-2xl p-6 shadow-sm sticky top-24">
-              <h3 className="font-bold text-lg mb-6">Tool Specifications</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-dashed">
-                  <span className="text-sm text-muted-foreground">Pricing</span>
-                  <span className="text-sm font-bold text-primary">{tool.pricingModel}</span>
+            <div className="bg-card border rounded-3xl p-8 shadow-sm sticky top-24">
+              <h3 className="font-bold text-xl mb-6">Specifications</h3>
+              <div className="space-y-6">
+                <div className="flex justify-between items-center py-2 border-b border-dashed">
+                  <span className="text-muted-foreground">Access Model</span>
+                  <Badge variant="outline" className="font-bold text-primary border-primary/20">{toolData.pricingModel}</Badge>
                 </div>
-                <div className="flex justify-between items-center py-3 border-b border-dashed">
-                  <span className="text-sm text-muted-foreground">Rating</span>
-                  <div className="flex items-center gap-1 text-sm font-bold text-amber-500">
+                <div className="flex justify-between items-center py-2 border-b border-dashed">
+                  <span className="text-muted-foreground">Scout Rating</span>
+                  <div className="flex items-center gap-1 font-bold text-amber-500">
                     <Star className="h-4 w-4 fill-current" />
-                    {tool.rating}/5.0
+                    {toolData.rating}
                   </div>
                 </div>
-                <div className="space-y-3 py-3">
-                  <span className="text-sm text-muted-foreground">Best For</span>
+                <div className="space-y-3">
+                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Target Roles</span>
                   <div className="flex flex-wrap gap-2">
-                    {tool.professionCategories.map(p => (
-                      <Badge key={p} variant="outline" className="capitalize">{p.replace('-', ' ')}</Badge>
+                    {toolData.professionCategories.map(p => (
+                      <Badge key={p} variant="secondary" className="capitalize text-xs font-semibold">{p.replace('-', ' ')}</Badge>
                     ))}
                   </div>
                 </div>
-                <div className="space-y-3 py-3">
-                  <span className="text-sm text-muted-foreground">Categories</span>
+                <div className="space-y-3">
+                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Domains</span>
                   <div className="flex flex-wrap gap-2">
-                    {tool.workCategories.map(w => (
-                      <Badge key={w} variant="outline" className="capitalize">{w.replace('-', ' ')}</Badge>
+                    {toolData.workCategories.map(w => (
+                      <Badge key={w} variant="outline" className="capitalize text-xs font-semibold">{w.replace('-', ' ')}</Badge>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-8 space-y-3">
-                <Button className="w-full bg-primary" asChild>
-                  <a href={tool.websiteUrl} target="_blank">Open Website</a>
+              <div className="mt-10 space-y-4">
+                <Button size="lg" className="w-full bg-primary font-bold rounded-2xl h-14 shadow-lg shadow-primary/20" asChild>
+                  <a href={toolData.websiteUrl} target="_blank">Launch {toolData.name}</a>
                 </Button>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href={`/compare?tools=${tool.slug}`}>Side-by-Side Comparison</Link>
+                <Button size="lg" variant="outline" className="w-full rounded-2xl h-14 font-bold" asChild>
+                  <Link href={`/compare?tools=${toolData.slug}`}>Side-by-Side Compare</Link>
                 </Button>
               </div>
 
