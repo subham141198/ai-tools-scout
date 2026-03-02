@@ -1,9 +1,8 @@
-
 "use client";
 
 import Link from "next/link";
 import Image from "next/image";
-import { Star, ArrowRight, ExternalLink, LayoutDashboard, Plus, Check } from "lucide-react";
+import { Star, ArrowRight, ExternalLink, Plus, Check, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AITool } from "@/lib/types";
@@ -39,15 +38,14 @@ export function ToolCard({ tool }: ToolCardProps) {
       params.delete('tools');
     }
     
-    // Stay on current page while updating selection
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
-    <Card className="group overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 bg-card">
-      <CardHeader className="p-0 relative h-32 bg-gradient-to-br from-primary/5 to-accent/5">
-        <div className="absolute inset-0 flex items-center justify-center p-6">
-          <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-4 border-white shadow-lg bg-white group-hover:scale-110 transition-transform duration-500">
+    <Card className="group overflow-hidden border border-border/50 shadow-sm hover:shadow-2xl transition-all duration-500 bg-card rounded-[2rem] flex flex-col h-full">
+      <CardHeader className="p-0 relative h-40 bg-muted/20 group-hover:bg-primary/5 transition-colors duration-500">
+        <div className="absolute inset-0 flex items-center justify-center p-8">
+          <div className="relative w-20 h-20 rounded-[1.5rem] overflow-hidden border-4 border-white shadow-xl bg-white group-hover:scale-110 group-hover:rotate-2 transition-transform duration-500 ease-out">
             <Image
               src={tool.logoUrl}
               alt={tool.name}
@@ -56,52 +54,66 @@ export function ToolCard({ tool }: ToolCardProps) {
             />
           </div>
         </div>
-        <div className="absolute top-2 right-2 flex gap-2">
-          <Button 
-            variant={isInComparison ? "default" : "secondary"} 
-            size="icon" 
-            className={`h-8 w-8 rounded-full shadow-lg transition-all ${isInComparison ? 'bg-primary scale-110 text-white hover:bg-primary/90' : 'bg-white/80 backdrop-blur-sm hover:bg-white'}`}
-            onClick={toggleCompare}
-            title={isInComparison ? "Remove from comparison" : "Add to comparison"}
-          >
-            {isInComparison ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-          </Button>
-          <Badge variant={tool.pricingModel === 'Free' ? 'secondary' : 'default'} className="bg-white/80 backdrop-blur-sm text-foreground hover:bg-white border-none text-[10px] font-bold">
+        
+        {/* Badges Overlay */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
+          {tool.featured && (
+            <Badge className="bg-amber-500 text-white border-none text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm">
+              Editor's Choice
+            </Badge>
+          )}
+          <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-primary border-none text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-sm w-fit">
             {tool.pricingModel}
           </Badge>
         </div>
+
+        {/* Compare Toggle */}
+        <div className="absolute top-4 right-4">
+          <Button 
+            variant={isInComparison ? "default" : "secondary"} 
+            size="icon" 
+            className={`h-10 w-10 rounded-2xl shadow-xl transition-all duration-300 ${isInComparison ? 'bg-primary text-white hover:bg-primary/90' : 'bg-white/90 backdrop-blur-sm hover:bg-white hover:scale-110'}`}
+            onClick={toggleCompare}
+          >
+            {isInComparison ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent className="p-5 pt-4">
-        <div className="flex items-center justify-between mb-2">
-          <Link href={`/tool/${tool.slug}`} className="block">
-            <h3 className="font-headline font-bold text-lg group-hover:text-primary transition-colors line-clamp-1">
+
+      <CardContent className="p-6 pt-6 flex-1 flex flex-col">
+        <div className="flex items-start justify-between mb-3 gap-2">
+          <Link href={`/tool/${tool.slug}`} className="block group/link">
+            <h3 className="font-headline font-black text-xl leading-none group-hover/link:text-primary transition-colors line-clamp-1 tracking-tight">
               {tool.name}
             </h3>
           </Link>
-          <div className="flex items-center gap-1 text-xs font-medium bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full">
+          <div className="flex items-center gap-1 text-[10px] font-black bg-amber-50 text-amber-600 px-2 py-1 rounded-lg border border-amber-100 shadow-sm shrink-0">
             <Star className="h-3 w-3 fill-current" />
             {tool.rating}
           </div>
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[40px] mb-4">
+        
+        <p className="text-sm text-muted-foreground line-clamp-2 min-h-[40px] mb-4 font-medium leading-relaxed">
           {tool.tagline}
         </p>
-        <div className="flex flex-wrap gap-1.5 mb-4">
+        
+        <div className="mt-auto flex flex-wrap gap-2">
           {tool.workCategories.slice(0, 2).map((cat) => (
-            <Badge key={cat} variant="outline" className="text-[10px] font-medium py-0 px-2 border-primary/20 text-primary/80">
-              {cat.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-            </Badge>
+            <span key={cat} className="text-[9px] font-black uppercase tracking-wider text-muted-foreground/60 bg-muted/50 px-2 py-1 rounded-md border border-muted-foreground/10 group-hover:border-primary/20 group-hover:text-primary/60 transition-colors">
+              {cat.replace('-', ' ')}
+            </span>
           ))}
         </div>
       </CardContent>
-      <CardFooter className="p-5 pt-0 flex gap-2">
-        <Button variant="secondary" size="sm" className="w-full gap-2 text-xs" asChild>
+
+      <CardFooter className="p-6 pt-0 flex gap-3">
+        <Button className="flex-1 rounded-2xl font-bold gap-2 shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all hover:-translate-y-0.5 h-11" asChild>
           <Link href={`/tool/${tool.slug}`}>
-            View Details
-            <ArrowRight className="h-3 w-3" />
+            View Profile
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
-        <Button variant="outline" size="icon" className="shrink-0 h-9 w-9 border-primary/10 hover:bg-primary hover:text-white transition-colors" asChild>
+        <Button variant="outline" size="icon" className="shrink-0 h-11 w-11 rounded-2xl border-primary/10 hover:bg-primary hover:text-white transition-all hover:scale-105" asChild title="Visit Official Site">
           <a href={tool.websiteUrl} target="_blank" rel="noopener noreferrer">
             <ExternalLink className="h-4 w-4" />
           </a>

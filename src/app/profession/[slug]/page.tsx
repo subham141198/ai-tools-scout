@@ -1,12 +1,27 @@
-
 import { PROFESSIONS } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
 import { ToolCard } from "@/components/ToolCard";
 import { AdPlacement } from "@/components/AdPlacement";
 import { notFound } from "next/navigation";
-import { LayoutGrid, Sparkles } from "lucide-react";
+import { 
+  LayoutGrid, 
+  Sparkles, 
+  SlidersHorizontal, 
+  ChevronDown, 
+  Star,
+  Search as SearchIcon
+} from "lucide-react";
 import { aiSearch } from "@/ai/flows/ai-search-flow";
 import { AITool } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 
 export default async function ProfessionPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -18,7 +33,6 @@ export default async function ProfessionPage({ params }: { params: Promise<{ slu
   let aiExplanation: string | null = null;
 
   try {
-    // Use AI to find the best tools in the world for this profession
     const aiResult = await aiSearch({ 
       query: `best AI tools for ${profession.name}` 
     });
@@ -38,52 +52,139 @@ export default async function ProfessionPage({ params }: { params: Promise<{ slu
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-12">
-        <header className="mb-12 text-center space-y-4">
-          <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <LayoutGrid className="h-8 w-8" />
+        {/* PLP Header */}
+        <header className="mb-12 pb-8 border-b">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">
+                <LayoutGrid className="h-3 w-3" />
+                Category: Professional Tools
+              </div>
+              <h1 className="text-4xl md:text-5xl font-headline font-black tracking-tight leading-none">
+                Best AI Tools for <span className="text-primary italic">{profession.name}</span>
+              </h1>
+              <p className="text-muted-foreground text-lg max-w-2xl font-medium">
+                Our AI researchers have curated {tools.length} of the top-rated global solutions for {profession.name.toLowerCase()} professionals.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="rounded-full h-12 px-6 gap-2 font-bold shadow-sm">
+                    Sort by: Top Rated
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Top Rated</DropdownMenuItem>
+                  <DropdownMenuItem>Price: Low to High</DropdownMenuItem>
+                  <DropdownMenuItem>Newest Arrivals</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-headline font-black tracking-tight">
-            Best AI Tools for <span className="text-primary italic">{profession.name}</span>
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Discover the top-rated global AI solutions specifically curated for {profession.name.toLowerCase()} by Gemini Intelligence.
-          </p>
         </header>
 
         <AdPlacement type="banner" />
 
-        {aiExplanation && (
-          <div className="mb-10 bg-primary/5 border border-primary/20 rounded-2xl p-6 flex gap-4 items-start animate-in fade-in slide-in-from-top-4 max-w-4xl mx-auto">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
-              <Sparkles className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <div className="space-y-1">
-              <h4 className="font-bold text-sm text-primary uppercase tracking-wider">Scout Analysis</h4>
-              <p className="text-foreground leading-relaxed italic">
-                "{aiExplanation}"
-              </p>
-            </div>
-          </div>
-        )}
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* PLP Sidebar */}
+          <aside className="lg:w-64 shrink-0 space-y-8 hidden lg:block">
+            <div className="space-y-6">
+              <h4 className="font-black text-xs uppercase tracking-widest text-muted-foreground/60 flex items-center gap-2">
+                <SlidersHorizontal className="h-3 w-3" />
+                Market Filters
+              </h4>
+              
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-sm font-black">Access Type</p>
+                  <div className="space-y-2">
+                    {['Free', 'Freemium', 'Paid', 'Subscription'].map(type => (
+                      <label key={type} className="flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors group">
+                        <input type="checkbox" className="rounded border-muted-foreground/30 text-primary focus:ring-primary h-4 w-4" />
+                        <span className="font-semibold group-hover:font-black">{type}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {tools.length > 0 ? (
-            tools.map(tool => <ToolCard key={tool.slug} tool={tool} />)
-          ) : (
-            <div className="col-span-full py-24 text-center bg-muted/20 rounded-3xl border-2 border-dashed">
-              <div className="flex flex-col items-center gap-4">
-                <LayoutGrid className="h-12 w-12 text-muted-foreground animate-pulse" />
-                <p className="text-muted-foreground font-medium">Scouting global models for {profession.name}...</p>
+                <div className="space-y-3">
+                  <p className="text-sm font-black">Scout Rating</p>
+                  <div className="space-y-2">
+                    {[4.5, 4.0, 3.5].map(rate => (
+                      <label key={rate} className="flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors group">
+                        <input type="checkbox" className="rounded border-muted-foreground/30 text-primary focus:ring-primary h-4 w-4" />
+                        <span className="flex items-center gap-1 font-semibold group-hover:font-black">
+                          {rate}+ <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t space-y-4">
+                   <p className="text-sm font-black">Related Roles</p>
+                   <div className="flex flex-wrap gap-2">
+                    {PROFESSIONS.filter(p => p.slug !== slug).slice(0, 6).map(p => (
+                      <Badge key={p.id} variant="secondary" className="bg-muted hover:bg-primary hover:text-white transition-colors cursor-pointer text-[10px] font-black px-3 py-1">
+                        <Link href={`/profession/${p.slug}`}>{p.name}</Link>
+                      </Badge>
+                    ))}
+                   </div>
+                </div>
+              </div>
+
+              <div className="bg-muted/50 rounded-3xl p-6 border-2 border-dashed border-muted-foreground/10 text-center">
+                <p className="text-xs font-bold text-muted-foreground leading-relaxed">
+                  Can't find what you're looking for? Try the <Link href="/" className="text-primary underline">Global AI Search</Link> for more niche queries.
+                </p>
               </div>
             </div>
-          )}
-        </div>
+          </aside>
 
-        <div className="mt-16">
-          <AdPlacement type="responsive" />
+          {/* PLP Content Grid */}
+          <div className="flex-1 space-y-8">
+            {aiExplanation && (
+              <div className="bg-primary/5 border border-primary/20 rounded-3xl p-8 flex gap-6 items-start animate-in fade-in slide-in-from-top-4 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+                  <Sparkles className="h-7 w-7 text-primary-foreground" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-black text-xs text-primary uppercase tracking-widest">Global Market Intelligence</h4>
+                  <p className="text-foreground leading-relaxed italic font-medium text-lg">
+                    "{aiExplanation}"
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+              {tools.length > 0 ? (
+                tools.map(tool => <ToolCard key={tool.slug} tool={tool} />)
+              ) : (
+                <div className="col-span-full py-24 text-center bg-muted/20 rounded-[3rem] border-2 border-dashed flex flex-col items-center gap-6">
+                   <div className="relative">
+                      <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
+                      <SearchIcon className="h-16 w-16 text-primary relative z-10" />
+                   </div>
+                   <div className="space-y-2">
+                    <p className="text-2xl font-black">Scouting Global Models...</p>
+                    <p className="text-muted-foreground max-w-sm mx-auto font-medium">
+                      Gemini is currently mapping the world's best tools for {profession.name}. This usually takes a few seconds.
+                    </p>
+                   </div>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-12">
+              <AdPlacement type="responsive" />
+            </div>
+          </div>
         </div>
       </main>
     </div>
