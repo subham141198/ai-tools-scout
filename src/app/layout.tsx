@@ -3,6 +3,8 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase';
+import { CompareBar } from '@/components/CompareBar';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'AI Tool Scout - Discover the Best AI Tools by Profession',
@@ -24,6 +26,9 @@ export default function RootLayout({
       <body className="font-body antialiased selection:bg-primary/20 selection:text-primary">
         <FirebaseClientProvider>
           {children}
+          <Suspense>
+            <CompareBar />
+          </Suspense>
           <Toaster />
         </FirebaseClientProvider>
       </body>

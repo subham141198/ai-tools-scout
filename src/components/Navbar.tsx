@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -11,11 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PROFESSIONS } from "@/lib/db";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Badge } from "./ui/badge";
 
 export function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const toolsCount = searchParams.get('tools')?.split(',').filter(Boolean).length || 0;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,10 +70,15 @@ export function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="outline" size="sm" asChild className="hidden sm:flex gap-2">
-            <Link href="/compare">
+          <Button variant="outline" size="sm" asChild className="hidden sm:flex gap-2 relative">
+            <Link href={toolsCount > 0 ? `/compare?tools=${searchParams.get('tools')}` : '/compare'}>
               <LayoutDashboard className="h-4 w-4" />
               Compare
+              {toolsCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-in zoom-in">
+                  {toolsCount}
+                </span>
+              )}
             </Link>
           </Button>
 

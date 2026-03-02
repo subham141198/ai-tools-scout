@@ -3,12 +3,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Star, ArrowRight, ExternalLink, LayoutDashboard, Plus } from "lucide-react";
+import { Star, ArrowRight, ExternalLink, LayoutDashboard, Plus, Check } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AITool } from "@/lib/types";
 import { Button } from "./ui/button";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 interface ToolCardProps {
   tool: AITool;
@@ -17,6 +17,7 @@ interface ToolCardProps {
 export function ToolCard({ tool }: ToolCardProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
   const currentTools = searchParams.get('tools')?.split(',').filter(Boolean) || [];
   const isInComparison = currentTools.includes(tool.slug);
 
@@ -38,8 +39,8 @@ export function ToolCard({ tool }: ToolCardProps) {
       params.delete('tools');
     }
     
-    // Maintain the search query if it exists
-    router.push(`/?${params.toString()}`);
+    // Stay on current page while updating selection
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
@@ -59,11 +60,11 @@ export function ToolCard({ tool }: ToolCardProps) {
           <Button 
             variant={isInComparison ? "default" : "secondary"} 
             size="icon" 
-            className={`h-8 w-8 rounded-full shadow-lg transition-all ${isInComparison ? 'bg-primary scale-110' : 'bg-white/80 backdrop-blur-sm hover:bg-white'}`}
+            className={`h-8 w-8 rounded-full shadow-lg transition-all ${isInComparison ? 'bg-primary scale-110 text-white hover:bg-primary/90' : 'bg-white/80 backdrop-blur-sm hover:bg-white'}`}
             onClick={toggleCompare}
             title={isInComparison ? "Remove from comparison" : "Add to comparison"}
           >
-            {isInComparison ? <LayoutDashboard className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {isInComparison ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           </Button>
           <Badge variant={tool.pricingModel === 'Free' ? 'secondary' : 'default'} className="bg-white/80 backdrop-blur-sm text-foreground hover:bg-white border-none text-[10px] font-bold">
             {tool.pricingModel}
