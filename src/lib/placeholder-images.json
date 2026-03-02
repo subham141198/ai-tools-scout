@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Abstract technological background",
+      "imageUrl": "https://images.unsplash.com/photo-1562575214-da9fcf59b907?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx0ZWNobm9sb2d5JTIwYWJzdHJhY3R8ZW58MHx8fHwxNzcyNDAwMzQwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "technology abstract"
+    },
+    {
+      "id": "tool-logo-1",
+      "description": "Minimalist tech logo",
+      "imageUrl": "https://images.unsplash.com/photo-1760037028517-e5cc6e3ebd3e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtaW5pbWFsaXN0JTIwbG9nb3xlbnwwfHx8fDE3NzI0MTA3MDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "minimalist logo"
+    },
+    {
+      "id": "tool-logo-2",
+      "description": "Modern software icon",
+      "imageUrl": "https://images.unsplash.com/photo-1707396173411-ce001d65c3cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzb2Z0d2FyZSUyMGljb258ZW58MHx8fHwxNzcyMzQ4NzIyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "software icon"
+    },
+    {
+      "id": "tool-logo-3",
+      "description": "Clean app icon",
+      "imageUrl": "https://images.unsplash.com/photo-1765218184769-84c7cfbdb9f1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhcHAlMjBpY29ufGVufDB8fHx8MTc3MjQwMjI3M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "app icon"
+    }
+  ]
 }
