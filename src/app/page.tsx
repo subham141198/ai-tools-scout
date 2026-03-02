@@ -58,7 +58,6 @@ export default async function HomePage({
       <Navbar />
       
       <main className="flex-1">
-        {/* Hero Section - Only show when not searching */}
         {!q && (
           <section className="relative py-20 overflow-hidden bg-gradient-to-b from-primary/5 via-background to-background border-b">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none opacity-50">
@@ -93,7 +92,6 @@ export default async function HomePage({
         <div className="container mx-auto px-4">
           {q ? (
             <div className="py-12">
-              {/* PLP Header */}
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b gap-4">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-primary font-bold uppercase tracking-wider">
@@ -128,7 +126,6 @@ export default async function HomePage({
               </div>
 
               <div className="flex flex-col lg:flex-row gap-10">
-                {/* PLP Sidebar Filters */}
                 <aside className="lg:w-64 shrink-0 space-y-8 hidden lg:block">
                   <div className="space-y-4">
                     <h4 className="font-bold flex items-center gap-2 text-sm uppercase tracking-widest text-muted-foreground/70">
@@ -176,15 +173,9 @@ export default async function HomePage({
                     </div>
                   </div>
                   
-                  <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
-                    <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">Pro Tip</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      AI Tool Scout researches thousands of tools in real-time. Use the <strong>Comparison Engine</strong> to see side-by-side feature lists.
-                    </p>
-                  </div>
+                  <AdPlacement type="sidebar" />
                 </aside>
 
-                {/* PLP Grid */}
                 <div className="flex-1 space-y-8">
                   {aiExplanation && (
                     <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex gap-4 items-start animate-in fade-in slide-in-from-top-4">
@@ -233,7 +224,6 @@ export default async function HomePage({
             <>
               <AdPlacement type="banner" className="my-12" />
 
-              {/* Featured Tools Section */}
               <section id="trending" className="py-12">
                 <div className="flex items-center justify-between mb-8 pb-4 border-b">
                   <div className="space-y-1">
@@ -254,7 +244,6 @@ export default async function HomePage({
 
               <AdPlacement type="responsive" className="my-12" />
 
-              {/* Browse by Profession */}
               <section className="py-16 bg-muted/30 -mx-4 px-4 rounded-[3rem] border">
                 <div className="text-center mb-12">
                   <h2 className="text-4xl font-headline font-black mb-4">Discover Your <span className="text-primary italic">Secret Weapons</span></h2>
