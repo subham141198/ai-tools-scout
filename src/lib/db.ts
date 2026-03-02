@@ -87,7 +87,13 @@ export async function getTools(filters?: { profession?: string; work?: string; s
   if (filters?.work) filtered = filtered.filter(t => t.workCategories.includes(filters.work!));
   if (filters?.search) {
     const s = filters.search.toLowerCase();
-    filtered = filtered.filter(t => t.name.toLowerCase().includes(s) || t.description.toLowerCase().includes(s));
+    filtered = filtered.filter(t => 
+      t.name.toLowerCase().includes(s) || 
+      t.description.toLowerCase().includes(s) ||
+      t.tagline.toLowerCase().includes(s) ||
+      t.professionCategories.some(pc => pc.toLowerCase().includes(s)) ||
+      t.workCategories.some(wc => wc.toLowerCase().includes(s))
+    );
   }
   return filtered;
 }
