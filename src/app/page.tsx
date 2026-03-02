@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { PROFESSIONS, WORK_CATEGORIES, getTrendingTools, getTools } from "@/lib/db";
+import { PROFESSIONS, MOCK_TOOLS, getTrendingTools } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
 import { ToolCard } from "@/components/ToolCard";
 import { AdPlacement } from "@/components/AdPlacement";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, Star, LayoutGrid, Clock, Search as SearchIcon } from "lucide-react";
+import { ArrowRight, TrendingUp, LayoutGrid, Clock, Search as SearchIcon, Sparkles } from "lucide-react";
+import { aiSearch } from "@/ai/flows/ai-search-flow";
 
 export default async function HomePage({ 
   searchParams 
@@ -13,7 +14,20 @@ export default async function HomePage({
 }) {
   const { q } = await searchParams;
   const trendingTools = await getTrendingTools();
-  const searchResults = q ? await getTools({ search: q }) : null;
+  
+  let searchResults = null;
+  let aiExplanation = null;
+
+  if (q) {
+    try {
+      const aiResult = await aiSearch({ query: q });
+      searchResults = MOCK_TOOLS.filter(tool => aiResult.recommendedToolIds.includes(tool.id));
+      aiExplanation = aiResult.aiExplanation;
+    } catch (error) {
+      console.error("AI Search Error:", error);
+      // Fallback or empty state handled below
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -60,16 +74,30 @@ export default async function HomePage({
             <section className="py-12 min-h-[400px]">
               <div className="flex items-center justify-between mb-8">
                 <div className="space-y-1">
-                  <h2 className="text-3xl font-headline font-bold flex items-center gap-2">
+                  <h2 className="text-3xl font-headline font-bold flex items-center gap-2 text-foreground">
                     <SearchIcon className="h-7 w-7 text-primary" />
                     Search Results for "{q}"
                   </h2>
-                  <p className="text-muted-foreground">Found {searchResults?.length || 0} tools matching your query.</p>
+                  <p className="text-muted-foreground">Intelligent search powered by Gemini AI</p>
                 </div>
                 <Button variant="ghost" asChild>
                   <Link href="/">Clear Search</Link>
                 </Button>
               </div>
+
+              {aiExplanation && (
+                <div className="mb-10 bg-primary/5 border border-primary/20 rounded-2xl p-6 flex gap-4 items-start animate-in fade-in slide-in-from-top-4">
+                  <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
+                    <Sparkles className="h-5 w-5 text-primary-foreground" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-bold text-sm text-primary uppercase tracking-wider">AI Insights</h4>
+                    <p className="text-foreground leading-relaxed italic">
+                      "{aiExplanation}"
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {searchResults && searchResults.length > 0 ? (
@@ -78,7 +106,12 @@ export default async function HomePage({
                   ))
                 ) : (
                   <div className="col-span-full py-20 text-center bg-muted/20 rounded-3xl border-2 border-dashed">
-                    <p className="text-muted-foreground">No tools found matching your search. Try searching for "Developers" or "Graphic Designers".</p>
+                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                      <SearchIcon className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <p className="text-muted-foreground max-w-sm mx-auto">
+                      Even our AI couldn't find a direct match in our current database. Try searching for broader terms like "Writing" or "Design".
+                    </p>
                   </div>
                 )}
               </div>
