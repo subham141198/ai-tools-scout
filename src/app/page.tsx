@@ -13,7 +13,11 @@ import {
   Sparkles, 
   SlidersHorizontal,
   ChevronDown,
-  Star
+  Star,
+  Twitter,
+  Github,
+  Linkedin,
+  Instagram
 } from "lucide-react";
 import { aiSearch } from "@/ai/flows/ai-search-flow";
 import { AITool } from "@/lib/types";
@@ -288,6 +292,20 @@ export default async function HomePage({
             <p className="text-sm text-muted-foreground leading-relaxed font-medium">
               Global intelligence for professional AI discovery. We research thousands of tools so you don't have to.
             </p>
+            <div className="flex items-center gap-4 pt-4">
+              <Link href="#" className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all">
+                <Twitter className="h-5 w-5" />
+              </Link>
+              <Link href="#" className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all">
+                <Github className="h-5 w-5" />
+              </Link>
+              <Link href="#" className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all">
+                <Linkedin className="h-5 w-5" />
+              </Link>
+              <Link href="#" className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-white transition-all">
+                <Instagram className="h-5 w-5" />
+              </Link>
+            </div>
           </div>
           
           <div>
