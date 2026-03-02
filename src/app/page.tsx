@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { PROFESSIONS, MOCK_TOOLS, getTrendingTools } from "@/lib/db";
+import { PROFESSIONS, getTrendingTools } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
 import { ToolCard } from "@/components/ToolCard";
 import { AdPlacement } from "@/components/AdPlacement";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, TrendingUp, LayoutGrid, Clock, Search as SearchIcon, Sparkles } from "lucide-react";
 import { aiSearch } from "@/ai/flows/ai-search-flow";
+import { AITool } from "@/lib/types";
 
 export default async function HomePage({ 
   searchParams 
@@ -15,17 +16,25 @@ export default async function HomePage({
   const { q } = await searchParams;
   const trendingTools = await getTrendingTools();
   
-  let searchResults = null;
-  let aiExplanation = null;
+  let searchResults: AITool[] | null = null;
+  let aiExplanation: string | null = null;
 
   if (q) {
     try {
       const aiResult = await aiSearch({ query: q });
-      searchResults = MOCK_TOOLS.filter(tool => aiResult.recommendedToolIds.includes(tool.id));
+      // Map AI results to AITool type for ToolCard compatibility
+      searchResults = aiResult.recommendedTools.map(tool => ({
+        ...tool,
+        slug: tool.id, // Using generated ID as slug for search results
+        createdAt: new Date().toISOString(),
+        featured: false,
+        approved: true,
+        logoUrl: tool.logoUrl || `https://picsum.photos/seed/${tool.id}/200/200`
+      })) as AITool[];
+      
       aiExplanation = aiResult.aiExplanation;
     } catch (error) {
       console.error("AI Search Error:", error);
-      // Fallback or empty state handled below
     }
   }
 
@@ -45,21 +54,21 @@ export default async function HomePage({
             <div className="container mx-auto px-4 text-center relative z-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-6 animate-fade-in">
                 <TrendingUp className="h-3 w-3" />
-                Over 10,000 AI Tools Cataloged
+                Global AI Intelligence at Your Fingertips
               </div>
               <h1 className="text-4xl md:text-6xl font-headline font-black tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
-                Discover the Best AI Tools <span className="text-primary italic">by Profession</span>
+                Scout the Best AI Tools <span className="text-primary italic">in the World</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
-                Compare, review, and choose smartly from thousands of AI tools categorized by your specific work type. Performance-driven discovery for the AI age.
+                Discover, compare, and harness the power of AI tools from across the globe. Our AI-powered search finds the perfect solutions for any task.
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button size="lg" className="rounded-full h-12 px-8 font-bold text-base bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-transform" asChild>
-                  <Link href="#trending">Browse Trending Tools</Link>
+                  <Link href="#trending">Browse Trending</Link>
                 </Button>
                 <Button size="lg" variant="outline" className="rounded-full h-12 px-8 font-bold text-base bg-background/50 backdrop-blur-sm" asChild>
-                  <Link href="/compare">Compare Tools</Link>
+                  <Link href="/compare">Compare Engine</Link>
                 </Button>
               </div>
             </div>
@@ -76,9 +85,9 @@ export default async function HomePage({
                 <div className="space-y-1">
                   <h2 className="text-3xl font-headline font-bold flex items-center gap-2 text-foreground">
                     <SearchIcon className="h-7 w-7 text-primary" />
-                    Search Results for "{q}"
+                    Global AI Search: "{q}"
                   </h2>
-                  <p className="text-muted-foreground">Intelligent search powered by Gemini AI</p>
+                  <p className="text-muted-foreground">Semantic search scanning the global AI landscape</p>
                 </div>
                 <Button variant="ghost" asChild>
                   <Link href="/">Clear Search</Link>
@@ -91,7 +100,7 @@ export default async function HomePage({
                     <Sparkles className="h-5 w-5 text-primary-foreground" />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="font-bold text-sm text-primary uppercase tracking-wider">AI Insights</h4>
+                    <h4 className="font-bold text-sm text-primary uppercase tracking-wider">Gemini Insights</h4>
                     <p className="text-foreground leading-relaxed italic">
                       "{aiExplanation}"
                     </p>
@@ -110,7 +119,7 @@ export default async function HomePage({
                       <SearchIcon className="h-8 w-8 text-muted-foreground" />
                     </div>
                     <p className="text-muted-foreground max-w-sm mx-auto">
-                      Even our AI couldn't find a direct match in our current database. Try searching for broader terms like "Writing" or "Design".
+                      Searching for the world's best tools... If results don't appear, try a more specific query.
                     </p>
                   </div>
                 )}
@@ -125,14 +134,10 @@ export default async function HomePage({
                 <div className="space-y-1">
                   <h2 className="text-3xl font-headline font-bold flex items-center gap-2">
                     <TrendingUp className="h-7 w-7 text-primary" />
-                    Trending AI Tools
+                    Featured AI Tools
                   </h2>
-                  <p className="text-muted-foreground">The most popular tools this week across all industries.</p>
+                  <p className="text-muted-foreground">High-performance tools recommended by our editors.</p>
                 </div>
-                <Button variant="ghost" className="gap-2 group">
-                  See All
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -148,9 +153,9 @@ export default async function HomePage({
           {/* Browse by Profession */}
           <section className="py-12 bg-muted/30 -mx-4 px-4 rounded-3xl">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-headline font-bold mb-4">Browse by Profession</h2>
+              <h2 className="text-3xl font-headline font-bold mb-4">Explore by Role</h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Find tools specifically built for your industry. From medicine to marketing, we've got you covered.
+                Every profession has its secret AI weapons. Find yours here.
               </p>
             </div>
 
@@ -170,27 +175,6 @@ export default async function HomePage({
             </div>
           </section>
 
-          {/* Newly Added Tools */}
-          {!q && (
-            <section className="py-12">
-              <div className="flex items-center justify-between mb-8">
-                <div className="space-y-1">
-                  <h2 className="text-3xl font-headline font-bold flex items-center gap-2">
-                    <Clock className="h-7 w-7 text-accent" />
-                    Newly Added
-                  </h2>
-                  <p className="text-muted-foreground">Fresh AI tools added to our directory today.</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trendingTools.slice(0, 3).map(tool => (
-                  <ToolCard key={tool.id} tool={tool} />
-                ))}
-              </div>
-            </section>
-          )}
-
           <AdPlacement type="banner" className="my-12" />
         </div>
       </main>
@@ -207,40 +191,38 @@ export default async function HomePage({
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              The world's most comprehensive directory for professional AI tools. Filter by role, compare features, and scale your productivity.
+              Global intelligence for professional AI discovery.
             </p>
           </div>
           
           <div>
-            <h4 className="font-bold mb-4">Professions</h4>
+            <h4 className="font-bold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              {PROFESSIONS.slice(0, 5).map(p => (
+              <li><Link href="/compare" className="hover:text-primary transition-colors">Comparison Tool</Link></li>
+              <li><Link href="/submit-tool" className="hover:text-primary transition-colors">Submit Tool</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-bold mb-4">Roles</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {PROFESSIONS.slice(0, 4).map(p => (
                 <li key={p.id}><Link href={`/profession/${p.slug}`} className="hover:text-primary transition-colors">{p.name}</Link></li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold mb-4">Resources</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><Link href="/compare" className="hover:text-primary transition-colors">Comparison Engine</Link></li>
-              <li><Link href="/submit-tool" className="hover:text-primary transition-colors">Submit a Tool</Link></li>
-              <li><Link href="/admin" className="hover:text-primary transition-colors">Admin Login</Link></li>
-              <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold mb-4">Stay Updated</h4>
-            <p className="text-sm text-muted-foreground mb-4">Get the latest AI tools delivered to your inbox.</p>
+            <h4 className="font-bold mb-4">Stay Ahead</h4>
+            <p className="text-sm text-muted-foreground mb-4">The AI world moves fast. We'll keep you updated.</p>
             <div className="flex gap-2">
-              <input type="email" placeholder="Email address" className="bg-background border rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:ring-1 focus:ring-primary" />
-              <Button size="sm">Join</Button>
+              <input type="email" placeholder="Email" className="bg-background border rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:ring-1 focus:ring-primary" />
+              <Button size="sm">Go</Button>
             </div>
           </div>
         </div>
         <div className="container mx-auto px-4 mt-12 pt-8 border-t text-center text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} AI Tool Scout. All rights reserved. Built for the AI-first professional.
+          &copy; {new Date().getFullYear()} AI Tool Scout. Global search powered by Gemini.
         </div>
       </footer>
     </div>
