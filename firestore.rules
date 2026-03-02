@@ -1,0 +1,18 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /tools/{toolId} {
+      allow read: if true;
+      allow write: if false; // Only admin via console/backend
+    }
+    match /professions/{professionId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /submissions/{submissionId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}

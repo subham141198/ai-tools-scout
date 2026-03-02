@@ -1,0 +1,70 @@
+
+{
+  "entities": {
+    "AITool": {
+      "title": "AITool",
+      "description": "Represents an AI tool in the directory.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "tagline": { "type": "string" },
+        "description": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "websiteUrl": { "type": "string", "format": "uri" },
+        "pricingModel": { "type": "string", "enum": ["Free", "Paid", "Freemium"] },
+        "professionCategories": { "type": "array", "items": { "type": "string" } },
+        "workCategories": { "type": "array", "items": { "type": "string" } },
+        "features": { "type": "array", "items": { "type": "string" } },
+        "pros": { "type": "array", "items": { "type": "string" } },
+        "cons": { "type": "array", "items": { "type": "string" } },
+        "rating": { "type": "number" },
+        "featured": { "type": "boolean" },
+        "approved": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "slug", "websiteUrl", "pricingModel"]
+    },
+    "Profession": {
+      "title": "Profession",
+      "description": "A professional category for AI tools.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "icon": { "type": "string" }
+      },
+      "required": ["name", "slug"]
+    },
+    "Submission": {
+      "title": "Submission",
+      "description": "A tool submission from a user.",
+      "type": "object",
+      "properties": {
+        "toolName": { "type": "string" },
+        "websiteUrl": { "type": "string", "format": "uri" },
+        "contactEmail": { "type": "string", "format": "email" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["toolName", "websiteUrl", "contactEmail"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com"]
+  },
+  "firestore": {
+    "/tools/{toolId}": {
+      "schema": { "$ref": "#/backend/entities/AITool" },
+      "description": "Collection of approved AI tools."
+    },
+    "/professions/{professionId}": {
+      "schema": { "$ref": "#/backend/entities/Profession" },
+      "description": "Collection of profession categories."
+    },
+    "/submissions/{submissionId}": {
+      "schema": { "$ref": "#/backend/entities/Submission" },
+      "description": "User submissions pending review."
+    }
+  }
+}
