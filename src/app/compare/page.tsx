@@ -2,7 +2,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { getToolBySlug } from "@/lib/db";
 import { AITool } from "@/lib/types";
@@ -18,11 +18,11 @@ export default function ComparePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [selectedTools, setSelectedTools] = useState<AITool[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [newToolInput, setNewToolInput] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
   
-  const slugs = searchParams.get('tools')?.split(',').filter(Boolean) || [];
+  const toolsParam = searchParams.get('tools') || "";
+  const slugs = useMemo(() => toolsParam.split(',').filter(Boolean), [toolsParam]);
 
   useEffect(() => {
     async function loadTools() {
@@ -65,11 +65,11 @@ export default function ComparePage() {
     }
     
     loadTools();
-  }, [searchParams.get('tools')]);
+  }, [slugs]);
 
   const removeTool = (slug: string) => {
     const newSlugs = slugs.filter(s => s !== slug);
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams.toString());
     if (newSlugs.length > 0) {
       params.set('tools', newSlugs.join(','));
     } else {
@@ -89,7 +89,7 @@ export default function ComparePage() {
     }
 
     const newSlugs = [...slugs, slug];
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams.toString());
     params.set('tools', newSlugs.join(','));
     setNewToolInput("");
     router.push(`${window.location.pathname}?${params.toString()}`);

@@ -25,7 +25,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased selection:bg-primary/20 selection:text-primary">
         <FirebaseClientProvider>
-          {children}
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground animate-pulse font-bold">Scouting Intelligence...</div>}>
+            {children}
+          </Suspense>
           <Suspense>
             <CompareBar />
           </Suspense>
