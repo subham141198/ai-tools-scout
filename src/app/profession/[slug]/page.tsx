@@ -22,8 +22,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { Metadata } from "next";
 
-export default async function ProfessionPage({ params }: { params: Promise<{ slug: string }> }) {
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const profession = PROFESSIONS.find(p => p.slug === slug);
+  
+  if (!profession) return { title: 'Profession Not Found' };
+
+  return {
+    title: profession.seoTitle || `Top AI Tools for ${profession.name} (2024)`,
+    description: profession.seoDescription || `Discover the best AI software and tools for ${profession.name.toLowerCase()} professionals. Curated list with reviews and ratings.`,
+    alternates: {
+      canonical: `https://aitoolscout.com/profession/${slug}`,
+    },
+  };
+}
+
+export default async function ProfessionPage({ params }: Props) {
   const { slug } = await params;
   const profession = PROFESSIONS.find(p => p.slug === slug);
   
@@ -51,8 +71,28 @@ export default async function ProfessionPage({ params }: { params: Promise<{ slu
     console.error("AI Profession Search Error:", error);
   }
 
+  // Structured Data for CollectionPage
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": `Best AI Tools for ${profession.name}`,
+    "description": `A curated collection of the top AI tools specifically designed for ${profession.name.toLowerCase()} professionals.`,
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": tools.map((tool, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `https://aitoolscout.com/tool/${tool.slug}`
+      }))
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-12">
         {/* PLP Header */}
