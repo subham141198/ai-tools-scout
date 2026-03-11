@@ -1,11 +1,11 @@
-
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { PROFESSIONS, getTrendingTools } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
 import { ToolCard } from "@/components/ToolCard";
+import { ToolCardSkeleton } from "@/components/ToolCardSkeleton";
 import { AdPlacement } from "@/components/AdPlacement";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -211,14 +211,15 @@ export default function HomePage() {
 
                 <div className="flex-1 space-y-8">
                   {isLoading ? (
-                    <div className="flex flex-col items-center justify-center py-24 gap-6 bg-muted/10 rounded-[3rem] border-2 border-dashed">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
-                        <Loader2 className="h-16 w-16 animate-spin text-primary relative z-10" />
+                    <div className="space-y-8">
+                      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex gap-4 items-center animate-pulse">
+                         <Loader2 className="h-6 w-6 animate-spin text-primary shrink-0" />
+                         <p className="text-sm font-bold text-primary">Consulting Scout Intelligence: Mapping global AI models...</p>
                       </div>
-                      <div className="text-center space-y-2">
-                        <p className="text-xl font-black">Scout Intelligence is researching...</p>
-                        <p className="text-muted-foreground max-w-xs mx-auto">Mapping the global AI landscape for "{q}"</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                          <ToolCardSkeleton key={i} />
+                        ))}
                       </div>
                     </div>
                   ) : (

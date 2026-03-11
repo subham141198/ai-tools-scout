@@ -1,6 +1,7 @@
 import { PROFESSIONS } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
 import { ToolCard } from "@/components/ToolCard";
+import { ToolCardSkeleton } from "@/components/ToolCardSkeleton";
 import { AdPlacement } from "@/components/AdPlacement";
 import { notFound } from "next/navigation";
 import { 
@@ -51,6 +52,7 @@ export default async function ProfessionPage({ params }: Props) {
 
   let tools: AITool[] = [];
   let aiExplanation: string | null = null;
+  let errorState = false;
 
   try {
     const aiResult = await aiSearch({ 
@@ -69,6 +71,7 @@ export default async function ProfessionPage({ params }: Props) {
     aiExplanation = aiResult.aiExplanation;
   } catch (error) {
     console.error("AI Profession Search Error:", error);
+    errorState = true;
   }
 
   // Structured Data for CollectionPage
@@ -107,7 +110,7 @@ export default async function ProfessionPage({ params }: Props) {
                 Best AI Tools for <span className="text-primary italic">{profession.name}</span>
               </h1>
               <p className="text-muted-foreground text-lg max-w-2xl font-medium">
-                Our AI researchers have curated {tools.length} of the top-rated global solutions for {profession.name.toLowerCase()} professionals.
+                Our AI researchers have curated {tools.length || '...'} of the top-rated global solutions for {profession.name.toLowerCase()} professionals.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -205,19 +208,16 @@ export default async function ProfessionPage({ params }: Props) {
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
               {tools.length > 0 ? (
                 tools.map(tool => <ToolCard key={tool.slug} tool={tool} />)
-              ) : (
-                <div className="col-span-full py-24 text-center bg-muted/20 rounded-[3rem] border-2 border-dashed flex flex-col items-center gap-6">
-                   <div className="relative">
-                      <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
-                      <SearchIcon className="h-16 w-16 text-primary relative z-10" />
-                   </div>
-                   <div className="space-y-2">
-                    <p className="text-2xl font-black">Scouting Global Models...</p>
-                    <p className="text-muted-foreground max-w-sm mx-auto font-medium">
-                      Gemini is currently mapping the world's best tools for {profession.name}. This usually takes a few seconds.
-                    </p>
-                   </div>
+              ) : errorState ? (
+                <div className="col-span-full py-24 text-center">
+                   <p className="text-muted-foreground">Failed to load tools. Please try again later.</p>
                 </div>
+              ) : (
+                <>
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <ToolCardSkeleton key={i} />
+                  ))}
+                </>
               )}
             </div>
 
