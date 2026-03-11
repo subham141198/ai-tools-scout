@@ -21,7 +21,9 @@
         "rating": { "type": "number" },
         "featured": { "type": "boolean" },
         "approved": { "type": "boolean" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time" },
+        "seoTitle": { "type": "string" },
+        "metaDescription": { "type": "string" }
       },
       "required": ["name", "slug", "websiteUrl", "pricingModel"]
     },
@@ -38,20 +40,28 @@
     },
     "Submission": {
       "title": "Submission",
-      "description": "A tool submission from a user.",
+      "description": "A tool submission from a user pending moderation.",
       "type": "object",
       "properties": {
-        "toolName": { "type": "string" },
+        "name": { "type": "string" },
         "websiteUrl": { "type": "string", "format": "uri" },
         "contactEmail": { "type": "string", "format": "email" },
+        "shortDescription": { "type": "string" },
+        "longDescription": { "type": "string" },
+        "pricingModel": { "type": "string" },
+        "professions": { "type": "array", "items": { "type": "string" } },
+        "workTypes": { "type": "array", "items": { "type": "string" } },
         "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
-        "submittedAt": { "type": "string", "format": "date-time" }
+        "submittedAt": { "type": "string", "format": "date-time" },
+        "seoTitle": { "type": "string" },
+        "metaDescription": { "type": "string" },
+        "logoUrl": { "type": "string" }
       },
-      "required": ["toolName", "websiteUrl", "contactEmail"]
+      "required": ["name", "websiteUrl", "contactEmail", "status"]
     },
     "Notification": {
       "title": "Notification",
-      "description": "A system notification for admins.",
+      "description": "A system notification for admin awareness.",
       "type": "object",
       "properties": {
         "message": { "type": "string" },
@@ -69,19 +79,19 @@
   "firestore": {
     "/tools/{toolId}": {
       "schema": { "$ref": "#/backend/entities/AITool" },
-      "description": "Collection of approved AI tools."
+      "description": "Collection of live, approved AI tools visible to users."
     },
     "/professions/{professionId}": {
       "schema": { "$ref": "#/backend/entities/Profession" },
-      "description": "Collection of profession categories."
+      "description": "Metadata for profession categories."
     },
     "/submissions/{submissionId}": {
       "schema": { "$ref": "#/backend/entities/Submission" },
-      "description": "User submissions pending review."
+      "description": "User tool submissions awaiting moderator review."
     },
     "/notifications/{notificationId}": {
       "schema": { "$ref": "#/backend/entities/Notification" },
-      "description": "System notifications for monitoring activity."
+      "description": "Internal logs and alerts for administrative activity."
     }
   }
 }

@@ -2,25 +2,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Tools are publicly readable, but only admins (authenticated users) can write
+    // Tools: Publicly readable, writeable only by authenticated admins
     match /tools/{toolId} {
       allow read: if true;
       allow write: if request.auth != null;
     }
     
-    // Professions are publicly readable
+    // Professions: Static-like data, publicly readable
     match /professions/{professionId} {
       allow read: if true;
-      allow write: if false;
+      allow write: if request.auth != null;
     }
     
-    // Anyone can submit a tool. Only authenticated admins can review them.
+    // Submissions: Anyone can create a submission. Only admins can read/update/delete.
     match /submissions/{submissionId} {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
     }
 
-    // Notifications can be created by the submission form. Admins can read/delete them.
+    // Notifications: Created by the system (submission form). Managed by admins.
     match /notifications/{notificationId} {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
