@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
@@ -13,6 +12,7 @@ import Link from "next/link";
 import { AdPlacement } from "@/components/AdPlacement";
 import { aiToolDetails } from "@/ai/flows/ai-tool-details-flow";
 import { Input } from "@/components/ui/input";
+import { GlobalLoader } from "@/components/GlobalLoader";
 
 export default function ComparePage() {
   const searchParams = useSearchParams();
@@ -34,12 +34,9 @@ export default function ComparePage() {
 
       setIsLoading(true);
       
-      // Fetch all tools in parallel
       const toolPromises = slugs.map(async (slug) => {
-        // Try local DB first
         let tool = await getToolBySlug(slug);
         
-        // If not found, try AI research
         if (!tool) {
           try {
             const aiResult = await aiToolDetails({ slug });
@@ -131,15 +128,11 @@ export default function ComparePage() {
         <AdPlacement type="banner" />
 
         {isLoading && selectedTools.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 space-y-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse"></div>
-              <Loader2 className="h-16 w-16 animate-spin text-primary relative z-10" />
-            </div>
-            <div className="text-center">
-              <p className="text-foreground font-black text-xl">Scout Intelligence is Working</p>
-              <p className="text-muted-foreground animate-pulse">Researching global models and mapping comparisons...</p>
-            </div>
+          <div className="py-24">
+            <GlobalLoader 
+              title="Building Comparison Matrix" 
+              message="Cross-referencing global pricing models and feature sets across multiple models..."
+            />
           </div>
         ) : selectedTools.length === 0 ? (
           <div className="bg-card rounded-3xl border-2 border-dashed p-20 text-center space-y-6 shadow-sm">
@@ -193,7 +186,7 @@ export default function ComparePage() {
                       <th className="p-8 min-w-[320px] text-center bg-muted/10 animate-pulse border-dashed border-2">
                          <div className="flex flex-col items-center gap-4 text-muted-foreground">
                             <Loader2 className="h-8 w-8 animate-spin" />
-                            <span className="font-bold text-sm">Fetching Next Tool...</span>
+                            <span className="font-bold text-sm italic">Fetching Next Tool Data...</span>
                          </div>
                       </th>
                     )}

@@ -5,6 +5,7 @@ import { FirebaseClientProvider } from '@/firebase';
 import { CompareBar } from '@/components/CompareBar';
 import { Suspense } from 'react';
 import { Inter } from 'next/font/google';
+import { GlobalLoader } from '@/components/GlobalLoader';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -66,7 +67,11 @@ export default function RootLayout({
     <html lang="en" className={`scroll-smooth ${inter.variable}`}>
       <body className="font-body antialiased selection:bg-primary/20 selection:text-primary">
         <FirebaseClientProvider>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground animate-pulse font-bold">Scouting Intelligence...</div>}>
+          <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-background">
+              <GlobalLoader />
+            </div>
+          }>
             {children}
           </Suspense>
           <Suspense>

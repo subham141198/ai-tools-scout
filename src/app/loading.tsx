@@ -1,0 +1,12 @@
+import { GlobalLoader } from "@/components/GlobalLoader";
+
+export default function Loading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <GlobalLoader 
+        title="Consulting Global Scout"
+        message="Researching the world's most advanced AI tools for your specific needs..."
+      />
+    </div>
+  );
+}

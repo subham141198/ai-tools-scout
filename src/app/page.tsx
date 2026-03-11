@@ -214,7 +214,7 @@ export default function HomePage() {
                     <div className="space-y-8">
                       <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex gap-4 items-center animate-pulse">
                          <Loader2 className="h-6 w-6 animate-spin text-primary shrink-0" />
-                         <p className="text-sm font-bold text-primary">Consulting Scout Intelligence: Mapping global AI models...</p>
+                         <p className="text-sm font-bold text-primary italic">Consulting Scout Intelligence: Mapping global AI models for your specific request...</p>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                         {[1, 2, 3, 4, 5, 6].map((i) => (
