@@ -1,8 +1,10 @@
+
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from '@/firebase';
 import { CompareBar } from '@/components/CompareBar';
+import { AdSense } from '@/components/AdSense';
 import { Suspense } from 'react';
 import { Inter } from 'next/font/google';
 import { GlobalLoader } from '@/components/GlobalLoader';
@@ -66,6 +68,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${inter.variable}`}>
       <body className="font-body antialiased selection:bg-primary/20 selection:text-primary">
+        <AdSense />
         <FirebaseClientProvider>
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center bg-background">
