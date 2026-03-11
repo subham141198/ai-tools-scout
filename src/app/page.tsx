@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
@@ -399,6 +400,7 @@ export default function HomePage() {
               <li><Link href="/compare" className="hover:text-primary transition-colors">Comparison Engine</Link></li>
               <li><Link href="/submit-tool" className="hover:text-primary transition-colors">List Your Tool</Link></li>
               <li><Link href="/admin" className="hover:text-primary transition-colors">Moderator Admin</Link></li>
+              <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
             </ul>
           </div>
 
