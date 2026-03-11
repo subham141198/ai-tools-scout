@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useFirestore, useCollection, useUser, useAuth } from "@/firebase";
 import { ADMIN_EMAILS } from "@/lib/db";
@@ -42,19 +42,25 @@ export default function AdminDashboard() {
   // Check if current user is an admin
   const isAdmin = user && ADMIN_EMAILS.includes(user.email || "");
 
-  // Fetch pending submissions (only if admin)
-  const submissionsQuery = isAdmin ? query(
-    collection(db, "submissions"), 
-    where("status", "==", "pending")
-  ) : null;
-  const { data: submissions, loading: dataLoading } = useCollection<any>(submissionsQuery);
+  // Memoize queries to prevent infinite re-render loops
+  const submissionsQuery = useMemo(() => {
+    if (!isAdmin || !db) return null;
+    return query(
+      collection(db, "submissions"), 
+      where("status", "==", "pending")
+    );
+  }, [isAdmin, db]);
 
-  // Fetch recent notifications (only if admin)
-  const notificationsQuery = isAdmin ? query(
-    collection(db, "notifications"),
-    orderBy("createdAt", "desc"),
-    limit(20)
-  ) : null;
+  const notificationsQuery = useMemo(() => {
+    if (!isAdmin || !db) return null;
+    return query(
+      collection(db, "notifications"),
+      orderBy("createdAt", "desc"),
+      limit(20)
+    );
+  }, [isAdmin, db]);
+
+  const { data: submissions, loading: dataLoading } = useCollection<any>(submissionsQuery);
   const { data: notifications } = useCollection<any>(notificationsQuery);
 
   const handleLogin = async (e: React.FormEvent) => {
