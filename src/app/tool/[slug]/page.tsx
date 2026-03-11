@@ -42,7 +42,7 @@ export async function generateMetadata(
       images: [tool.logoUrl, ...previousImages],
     },
     alternates: {
-      canonical: `https://aitoolscout.com/tool/${slug}`,
+      canonical: `https://aitoolscompus.vercel.app/tool/${slug}`,
     },
   };
 }

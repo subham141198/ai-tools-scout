@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: profession.seoTitle || `Top AI Tools for ${profession.name} (2024)`,
     description: profession.seoDescription || `Discover the best AI software and tools for ${profession.name.toLowerCase()} professionals. Curated list with reviews and ratings.`,
     alternates: {
-      canonical: `https://aitoolscout.com/profession/${slug}`,
+      canonical: `https://aitoolscompus.vercel.app/profession/${slug}`,
     },
   };
 }
@@ -85,7 +85,7 @@ export default async function ProfessionPage({ params }: Props) {
       "itemListElement": tools.map((tool, index) => ({
         "@type": "ListItem",
         "position": index + 1,
-        "url": `https://aitoolscout.com/tool/${tool.slug}`
+        "url": `https://aitoolscompus.vercel.app/tool/${tool.slug}`
       }))
     }
   };

@@ -1,4 +1,3 @@
-
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -22,12 +21,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://aitoolscout.com'),
+  metadataBase: new URL('https://aitoolscompus.vercel.app'),
   title: {
     default: 'AI Tool Scout - Discover the Best AI Tools by Profession',
     template: '%s | AI Tool Scout'
   },
-  description: 'Explore 10,000+ AI tools categorized by profession and work type. Compare features, pricing, and performance in one place.',
+  description: 'Explore thousands of AI tools categorized by profession and work type. Compare features, pricing, and performance in one place.',
   keywords: ['AI tools', 'artificial intelligence', 'directory', 'comparison', 'productivity', 'software', 'machine learning'],
   authors: [{ name: 'AI Tool Scout Team' }],
   creator: 'AI Tool Scout',
@@ -42,7 +41,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://aitoolscout.com',
+    url: 'https://aitoolscompus.vercel.app',
     siteName: 'AI Tool Scout',
     title: 'AI Tool Scout - Global Intelligence for Professional Discovery',
     description: 'The world\'s most comprehensive directory of AI tools researched by Gemini AI.',

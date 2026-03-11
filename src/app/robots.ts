@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: '/api/',
+      disallow: '/admin/',
     },
-    sitemap: 'https://aitoolscout.com/sitemap.xml',
+    sitemap: 'https://aitoolscompus.vercel.app/sitemap.xml',
   };
 }

@@ -2,13 +2,14 @@ import { MetadataRoute } from 'next';
 import { PROFESSIONS, MOCK_TOOLS } from '@/lib/db';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://aitoolscout.com';
+  const baseUrl = 'https://aitoolscompus.vercel.app';
 
   // Static routes
   const staticRoutes = [
     '',
     '/compare',
     '/submit-tool',
+    '/privacy',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
@@ -24,7 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  // Tool routes (using mock tools as base)
+  // Tool routes (using mock tools as base, Google will discover AI routes via links)
   const toolRoutes = MOCK_TOOLS.map((tool) => ({
     url: `${baseUrl}/tool/${tool.slug}`,
     lastModified: new Date(),
