@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -48,13 +47,19 @@ export default function SubmitToolPage() {
       return;
     }
 
+    // Sanitize URL for Genkit validation
+    let sanitizedUrl = formData.websiteUrl.trim();
+    if (sanitizedUrl && !sanitizedUrl.startsWith('http')) {
+      sanitizedUrl = `https://${sanitizedUrl}`;
+    }
+
     setIsGenerating(true);
     try {
       const result = await aiSeoContentGenerator({
         context: 'tool',
         toolName: formData.name,
         toolShortDescription: formData.shortDescription,
-        toolWebsiteUrl: formData.websiteUrl,
+        toolWebsiteUrl: sanitizedUrl || undefined,
         professionCategories: formData.professions,
         workCategories: formData.workTypes
       });
@@ -70,11 +75,11 @@ export default function SubmitToolPage() {
         title: "Success!",
         description: "SEO content generated successfully using AI.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       toast({
         title: "Generation Failed",
-        description: "Could not generate content at this time.",
+        description: error.message || "Could not generate content at this time.",
         variant: "destructive"
       });
     } finally {
@@ -86,8 +91,15 @@ export default function SubmitToolPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Sanitize URL before saving to DB
+    let sanitizedUrl = formData.websiteUrl.trim();
+    if (sanitizedUrl && !sanitizedUrl.startsWith('http')) {
+      sanitizedUrl = `https://${sanitizedUrl}`;
+    }
+
     const submissionData = {
       ...formData,
+      websiteUrl: sanitizedUrl,
       status: 'pending',
       submittedAt: serverTimestamp(),
       logoUrl: `https://picsum.photos/seed/${formData.name.toLowerCase().replace(/\s+/g, '-')}/400/400`,
@@ -181,8 +193,8 @@ export default function SubmitToolPage() {
                     <Label htmlFor="url">Website URL</Label>
                     <Input 
                       id="url" 
-                      type="url" 
-                      placeholder="https://..." 
+                      type="text" 
+                      placeholder="quillbot.com" 
                       required 
                       value={formData.websiteUrl}
                       onChange={e => setFormData(f => ({ ...f, websiteUrl: e.target.value }))}

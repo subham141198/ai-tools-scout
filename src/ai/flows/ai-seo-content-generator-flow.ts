@@ -19,7 +19,7 @@ const BaseInputSchema = z.object({
 const ToolInputSchema = BaseInputSchema.extend({
   context: z.literal('tool'),
   toolName: z.string().describe('The name of the AI tool.'),
-  toolWebsiteUrl: z.string().url().optional().describe('The website URL of the AI tool.'),
+  toolWebsiteUrl: z.string().optional().describe('The website URL of the AI tool.'),
   toolShortDescription: z.string().optional().describe('A brief existing description of the AI tool.'),
   professionCategories: z.array(z.string()).optional().describe('Professions this tool is relevant for.'),
   workCategories: z.array(z.string()).optional().describe('Work types this tool is relevant for.'),
