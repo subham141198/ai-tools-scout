@@ -1,3 +1,4 @@
+
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -34,6 +35,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  verification: {
+    google: "REPLACE_WITH_YOUR_VERIFICATION_TOKEN", // Get this from Search Console HTML Tag method
   },
   other: {
     "google-adsense-account": "ca-pub-1827849890156562",
