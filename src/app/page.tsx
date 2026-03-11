@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
@@ -44,6 +45,7 @@ export default function HomePage() {
   const [searchResults, setSearchResults] = useState<AITool[] | null>(null);
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [navigatingProfessionId, setNavigatingProfessionId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadInitialData() {
@@ -197,7 +199,7 @@ export default function HomePage() {
                         <p className="text-sm font-black">Explore Roles</p>
                         <div className="flex flex-wrap gap-2">
                           {PROFESSIONS.slice(0, 8).map(prof => (
-                            <Badge key={prof.id} variant="secondary" className="hover:bg-primary hover:text-white transition-colors cursor-pointer bg-muted/50 text-[10px] font-bold py-1 px-3 rounded-full uppercase">
+                            <Badge key={prof.id} variant="secondary" className="hover:bg-primary hover:text-white transition-colors cursor-pointer bg-muted/50 text-[10px] font-bold py-1 px-3 rounded-full uppercase" asChild>
                               <Link href={`/profession/${prof.slug}`}>{prof.name}</Link>
                             </Badge>
                           ))}
@@ -306,8 +308,15 @@ export default function HomePage() {
                     <Link 
                       key={prof.id} 
                       href={`/profession/${prof.slug}`}
-                      className="group p-8 rounded-3xl bg-background border hover:border-primary hover:shadow-2xl transition-all text-center space-y-4 hover:-translate-y-1 duration-300"
+                      onClick={() => setNavigatingProfessionId(prof.id)}
+                      className="group p-8 rounded-3xl bg-background border hover:border-primary hover:shadow-2xl transition-all text-center space-y-4 hover:-translate-y-1 duration-300 relative overflow-hidden"
                     >
+                      {navigatingProfessionId === prof.id ? (
+                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 animate-in fade-in duration-300">
+                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                          <span className="text-[10px] font-black uppercase tracking-widest mt-2 text-primary">Researching...</span>
+                        </div>
+                      ) : null}
                       <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-sm">
                         <LayoutGrid className="h-8 w-8" />
                       </div>

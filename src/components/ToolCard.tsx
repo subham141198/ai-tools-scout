@@ -1,8 +1,10 @@
+
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Star, ArrowRight, ExternalLink, Plus, Check, TrendingUp } from "lucide-react";
+import { Star, ArrowRight, ExternalLink, Plus, Check, Loader2 } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AITool } from "@/lib/types";
@@ -19,6 +21,7 @@ export function ToolCard({ tool }: ToolCardProps) {
   const pathname = usePathname();
   const currentTools = searchParams.get('tools')?.split(',').filter(Boolean) || [];
   const isInComparison = currentTools.includes(tool.slug);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const toggleCompare = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -41,8 +44,12 @@ export function ToolCard({ tool }: ToolCardProps) {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  const handleProfileClick = () => {
+    setIsNavigating(true);
+  };
+
   return (
-    <Card className="group overflow-hidden border border-border/50 shadow-sm hover:shadow-2xl transition-all duration-500 bg-card rounded-[2rem] flex flex-col h-full">
+    <Card className="group overflow-hidden border border-border/50 shadow-sm hover:shadow-2xl transition-all duration-500 bg-card rounded-[2rem] flex flex-col h-full relative">
       <CardHeader className="p-0 relative h-40 bg-muted/20 group-hover:bg-primary/5 transition-colors duration-500">
         <div className="absolute inset-0 flex items-center justify-center p-8">
           <div className="relative w-20 h-20 rounded-[1.5rem] overflow-hidden border-4 border-white shadow-xl bg-white group-hover:scale-110 group-hover:rotate-2 transition-transform duration-500 ease-out">
@@ -82,7 +89,7 @@ export function ToolCard({ tool }: ToolCardProps) {
 
       <CardContent className="p-6 pt-6 flex-1 flex flex-col">
         <div className="flex items-start justify-between mb-3 gap-2">
-          <Link href={`/tool/${tool.slug}`} className="block group/link">
+          <Link href={`/tool/${tool.slug}`} onClick={handleProfileClick} className="block group/link">
             <h3 className="font-headline font-black text-xl leading-none group-hover/link:text-primary transition-colors line-clamp-1 tracking-tight">
               {tool.name}
             </h3>
@@ -107,10 +114,15 @@ export function ToolCard({ tool }: ToolCardProps) {
       </CardContent>
 
       <CardFooter className="p-6 pt-0 flex gap-3">
-        <Button className="flex-1 rounded-2xl font-bold gap-2 shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all hover:-translate-y-0.5 h-11" asChild>
+        <Button 
+          className="flex-1 rounded-2xl font-bold gap-2 shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all hover:-translate-y-0.5 h-11" 
+          disabled={isNavigating}
+          onClick={handleProfileClick}
+          asChild
+        >
           <Link href={`/tool/${tool.slug}`}>
-            View Profile
-            <ArrowRight className="h-4 w-4" />
+            {isNavigating ? <Loader2 className="h-4 w-4 animate-spin" /> : "View Profile"}
+            {!isNavigating && <ArrowRight className="h-4 w-4" />}
           </Link>
         </Button>
         <Button variant="outline" size="icon" className="shrink-0 h-11 w-11 rounded-2xl border-primary/10 hover:bg-primary hover:text-white transition-all hover:scale-105" asChild title="Visit Official Site">
