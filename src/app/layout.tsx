@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   verification: {
-    google: "REPLACE_WITH_YOUR_VERIFICATION_TOKEN", // Get this from Search Console HTML Tag method
+    google: "skXpIhB8h7Ug4JDTUKy6K7ql7eKfKGqIJYiihtjG_co",
   },
   other: {
     "google-adsense-account": "ca-pub-1827849890156562",
