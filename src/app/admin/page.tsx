@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -16,12 +15,14 @@ import {
   orderBy,
   limit
 } from "firebase/firestore";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Check, X, ExternalLink, ShieldCheck, Bell, History, LogIn, Lock, AlertTriangle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2, Check, X, ExternalLink, ShieldCheck, Bell, History, LogIn, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -32,12 +33,14 @@ export default function AdminDashboard() {
   const auth = useAuth();
   const db = useFirestore();
   const { toast } = useToast();
+  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  // Deep Authorization & Provider Check
-  const isGoogleUser = user?.providerData.some(p => p.providerId === 'google.com');
-  const isEmailVerified = user?.emailVerified;
-  const isAdmin = user && ADMIN_EMAILS.includes(user.email || "") && isGoogleUser && isEmailVerified;
+  // Check if current user is an admin
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email || "");
 
   // Fetch pending submissions (only if admin)
   const submissionsQuery = isAdmin ? query(
@@ -54,41 +57,88 @@ export default function AdminDashboard() {
   ) : null;
   const { data: notifications } = useCollection<any>(notificationsQuery);
 
-  const handleSignIn = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
     try {
-      const provider = new GoogleAuthProvider();
-      // Enforce account selection
-      provider.setCustomParameters({ prompt: 'select_account' });
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Auth error:", error);
+      await signInWithEmailAndPassword(auth, email, password);
+      toast({
+        title: "Welcome back",
+        description: "Authenticated successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid credentials.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingIn(false);
     }
+  };
+
+  const handleSignOut = () => {
+    signOut(auth);
   };
 
   if (authLoading) return <div className="min-h-screen flex items-center justify-center bg-background font-bold text-primary animate-pulse">Authenticating Moderator...</div>;
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center space-y-6 text-center bg-background px-4">
-        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-          <ShieldCheck className="h-10 w-10 text-primary" />
-        </div>
-        <div className="space-y-2 max-w-sm">
-          <h1 className="text-3xl font-black">Moderator Access</h1>
-          <p className="text-muted-foreground font-medium">Please sign in with your administrative Google account to manage submissions.</p>
-        </div>
-        <Button size="lg" className="rounded-full px-8 gap-2 font-bold" onClick={handleSignIn}>
-          <LogIn className="h-5 w-5" />
-          Sign in with Google
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href="/">Back to Home</Link>
-        </Button>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+        <Card className="w-full max-w-md border-none shadow-2xl rounded-[2.5rem] overflow-hidden">
+          <CardHeader className="text-center space-y-4 pt-12">
+            <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-2">
+              <ShieldCheck className="h-10 w-10 text-primary" />
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="text-3xl font-black">Moderator Login</CardTitle>
+              <CardDescription className="text-muted-foreground font-medium">Enter your credentials to manage the AI directory.</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8 pt-0">
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email">Admin Email</Label>
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="admin@aitoolscout.com" 
+                  required 
+                  className="rounded-xl h-12"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input 
+                  id="password" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  required 
+                  className="rounded-xl h-12"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <Button type="submit" className="w-full h-12 rounded-xl font-bold text-lg shadow-lg shadow-primary/20" disabled={isLoggingIn}>
+                {isLoggingIn ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <LogIn className="h-5 w-5 mr-2" />}
+                Sign In
+              </Button>
+              <div className="text-center">
+                <Button variant="link" asChild className="text-muted-foreground text-sm font-bold">
+                  <Link href="/">Back to Home</Link>
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  // Unauthorized view (either not in list, not google, or not verified)
+  // Unauthorized view
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-6 text-center bg-background px-4">
@@ -97,28 +147,12 @@ export default function AdminDashboard() {
         </div>
         <div className="space-y-4 max-w-md">
           <h1 className="text-3xl font-black">Access Denied</h1>
-          
-          <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-6 text-left space-y-4">
-            <div className="flex items-start gap-3">
-              <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${ADMIN_EMAILS.includes(user.email || "") ? 'bg-emerald-500' : 'bg-destructive'}`} />
-              <p className="text-sm font-medium">Email <strong>{user.email}</strong> {ADMIN_EMAILS.includes(user.email || "") ? 'is on the whitelist.' : 'is not an authorized admin.'}</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${isGoogleUser ? 'bg-emerald-500' : 'bg-destructive'}`} />
-              <p className="text-sm font-medium">Authentication via Google: {isGoogleUser ? 'Verified' : 'Failed'}</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${isEmailVerified ? 'bg-emerald-500' : 'bg-destructive'}`} />
-              <p className="text-sm font-medium">Email Verification Status: {isEmailVerified ? 'Verified' : 'Unverified'}</p>
-            </div>
-          </div>
-          
-          <p className="text-muted-foreground font-medium text-sm">
-            Please contact the system administrator if you believe this is an error.
+          <p className="text-muted-foreground font-medium">
+            Your account <strong>{user.email}</strong> is not authorized to access this dashboard.
           </p>
         </div>
         <div className="flex gap-4">
-          <Button variant="outline" className="rounded-full px-8 font-bold" onClick={() => auth.signOut()}>
+          <Button variant="outline" className="rounded-full px-8 font-bold" onClick={handleSignOut}>
             Sign Out
           </Button>
           <Button size="lg" className="rounded-full px-8 font-bold" asChild>
@@ -131,7 +165,6 @@ export default function AdminDashboard() {
 
   const handleApprove = async (submission: any) => {
     setProcessingId(submission.id);
-    
     const submissionRef = doc(db, 'submissions', submission.id);
     const toolsRef = collection(db, 'tools');
     const notificationsRef = collection(db, 'notifications');
@@ -169,18 +202,17 @@ export default function AdminDashboard() {
               createdAt: serverTimestamp(),
               read: false
             });
-
             setProcessingId(null);
             toast({
               title: "Tool Approved!",
-              description: `${submission.name} is now live in the directory.`,
+              description: `${submission.name} is now live.`,
             });
           })
-          .catch(async (err) => {
+          .catch(() => {
             errorEmitter.emit('permission-error', new FirestorePermissionError({ path: submissionRef.path, operation: 'update' }));
           });
       })
-      .catch(async (err) => {
+      .catch(() => {
         errorEmitter.emit('permission-error', new FirestorePermissionError({ path: toolsRef.path, operation: 'create' }));
       });
   };
@@ -199,15 +231,14 @@ export default function AdminDashboard() {
           createdAt: serverTimestamp(),
           read: false
         });
-
         setProcessingId(null);
         toast({
           title: "Submission Rejected",
-          description: "Submission has been archived as rejected.",
+          description: "Archived as rejected.",
           variant: "destructive"
         });
       })
-      .catch(async (err) => {
+      .catch(() => {
         errorEmitter.emit('permission-error', new FirestorePermissionError({ path: submissionRef.path, operation: 'update' }));
       });
   };
@@ -225,15 +256,15 @@ export default function AdminDashboard() {
               </h1>
               <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-xs font-bold w-fit border border-emerald-100">
                 <Check className="h-3 w-3" />
-                Secure Admin Session
+                Secure Session
               </div>
             </div>
             <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border shadow-sm">
               <div className="px-4 text-right">
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Authorized As</p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Logged In As</p>
                 <p className="text-sm font-bold truncate max-w-[150px]">{user.email}</p>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => auth.signOut()} className="rounded-xl">Sign Out</Button>
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="rounded-xl">Sign Out</Button>
             </div>
           </div>
 
@@ -252,7 +283,7 @@ export default function AdminDashboard() {
               {dataLoading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                  <p className="font-bold text-muted-foreground">Syncing Submission Database...</p>
+                  <p className="font-bold text-muted-foreground">Syncing Database...</p>
                 </div>
               ) : !submissions || submissions.length === 0 ? (
                 <Card className="border-2 border-dashed p-24 text-center bg-card rounded-[3rem]">
@@ -260,7 +291,7 @@ export default function AdminDashboard() {
                     <Check className="h-10 w-10 text-emerald-500" />
                   </div>
                   <h2 className="text-2xl font-bold">Review Queue Empty</h2>
-                  <p className="text-muted-foreground mt-2">All submitted tools have been moderated. Good job!</p>
+                  <p className="text-muted-foreground mt-2">All submitted tools have been moderated.</p>
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 gap-8">
@@ -322,10 +353,10 @@ export default function AdminDashboard() {
                           </div>
                           <div className="lg:col-span-8 space-y-6">
                              <div>
-                                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-2">AI-Generated SEO Analysis</p>
+                                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-2">AI-Generated SEO Content</p>
                                 <div className="bg-muted/10 p-6 rounded-2xl border border-dashed border-muted-foreground/20 max-h-[400px] overflow-y-auto">
                                    <div className="mb-6 pb-6 border-b border-dashed">
-                                      <h4 className="font-black text-sm text-primary mb-1">Generated SEO Title</h4>
+                                      <h4 className="font-black text-sm text-primary mb-1">SEO Title</h4>
                                       <p className="font-bold italic">"{sub.seoTitle || "N/A"}"</p>
                                    </div>
                                    <div className="prose prose-sm prose-slate max-w-none whitespace-pre-line text-muted-foreground font-medium">
@@ -349,7 +380,7 @@ export default function AdminDashboard() {
                      <History className="h-6 w-6 text-primary" />
                      <CardTitle>Global Activity Log</CardTitle>
                    </div>
-                   <CardDescription className="text-base">A real-time record of all submissions and administrative actions.</CardDescription>
+                   <CardDescription className="text-base">Real-time record of all administrative actions.</CardDescription>
                  </CardHeader>
                  <CardContent className="p-8">
                    <div className="space-y-4">

@@ -14,7 +14,7 @@ import {
 
 // Authorized Admin Emails
 export const ADMIN_EMAILS = [
-  'admin1@example.com',
+  'banerjee.subham1411@gmail.com',
   'admin2@example.com',
   'admin3@example.com'
 ];

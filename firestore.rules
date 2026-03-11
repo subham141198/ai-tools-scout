@@ -1,12 +1,9 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Shared check for authorized admin emails with provider verification
+    // Check if user is in the authorized admin list
     function isAdmin() {
       return request.auth != null && 
-        request.auth.token.firebase.sign_in_provider == 'google.com' &&
-        request.auth.token.email_verified == true &&
         request.auth.token.email in [
           'banerjee.subham1411@gmail.com', 
           'admin2@example.com', 
