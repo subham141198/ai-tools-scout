@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useFirestore, useCollection, useUser, useAuth } from "@/firebase";
+import { ADMIN_EMAILS } from "@/lib/db";
 import { 
   collection, 
   query, 
@@ -20,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Check, X, ExternalLink, ShieldCheck, Bell, History, LogIn } from "lucide-react";
+import { Loader2, Check, X, ExternalLink, ShieldCheck, Bell, History, LogIn, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -33,19 +34,22 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  // Fetch pending submissions
-  const submissionsQuery = query(
+  // Authorization Check
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email || "");
+
+  // Fetch pending submissions (only if admin)
+  const submissionsQuery = isAdmin ? query(
     collection(db, "submissions"), 
     where("status", "==", "pending")
-  );
+  ) : null;
   const { data: submissions, loading: dataLoading } = useCollection<any>(submissionsQuery);
 
-  // Fetch recent notifications
-  const notificationsQuery = query(
+  // Fetch recent notifications (only if admin)
+  const notificationsQuery = isAdmin ? query(
     collection(db, "notifications"),
     orderBy("createdAt", "desc"),
     limit(20)
-  );
+  ) : null;
   const { data: notifications } = useCollection<any>(notificationsQuery);
 
   const handleSignIn = async () => {
@@ -57,7 +61,7 @@ export default function AdminDashboard() {
     }
   };
 
-  if (authLoading) return <div className="min-h-screen flex items-center justify-center bg-background">Authenticating Moderator...</div>;
+  if (authLoading) return <div className="min-h-screen flex items-center justify-center bg-background font-bold text-primary animate-pulse">Authenticating Moderator...</div>;
 
   if (!user) {
     return (
@@ -76,6 +80,31 @@ export default function AdminDashboard() {
         <Button variant="ghost" asChild>
           <Link href="/">Back to Home</Link>
         </Button>
+      </div>
+    );
+  }
+
+  // Unauthorized view
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center space-y-6 text-center bg-background px-4">
+        <div className="w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
+          <Lock className="h-10 w-10 text-destructive" />
+        </div>
+        <div className="space-y-2 max-w-sm">
+          <h1 className="text-3xl font-black">Access Denied</h1>
+          <p className="text-muted-foreground font-medium">
+            The account <strong>{user.email}</strong> does not have moderator privileges. Please contact the site owner or switch to an authorized account.
+          </p>
+        </div>
+        <div className="flex gap-4">
+          <Button variant="outline" className="rounded-full px-8 font-bold" onClick={() => auth.signOut()}>
+            Sign Out
+          </Button>
+          <Button size="lg" className="rounded-full px-8 font-bold" asChild>
+            <Link href="/">Back to Home</Link>
+          </Button>
+        </div>
       </div>
     );
   }

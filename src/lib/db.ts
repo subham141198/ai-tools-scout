@@ -12,6 +12,13 @@ import {
   orderBy
 } from 'firebase/firestore';
 
+// Authorized Admin Emails
+export const ADMIN_EMAILS = [
+  'admin1@example.com',
+  'admin2@example.com',
+  'admin3@example.com'
+];
+
 // Static categories for the UI
 export const PROFESSIONS: Profession[] = [
   { id: '1', name: 'Developers', slug: 'developers', icon: 'Code' },

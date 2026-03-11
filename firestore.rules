@@ -2,28 +2,38 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Tools: Publicly readable, writeable only by authenticated admins
+    // Shared check for authorized admin emails
+    function isAdmin() {
+      return request.auth != null && 
+        request.auth.token.email in [
+          'admin1@example.com', 
+          'admin2@example.com', 
+          'admin3@example.com'
+        ];
+    }
+
+    // Tools: Publicly readable, writeable only by authorized admins
     match /tools/{toolId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
     
     // Professions: Static-like data, publicly readable
     match /professions/{professionId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
     
-    // Submissions: Anyone can create a submission. Only admins can read/update/delete.
+    // Submissions: Anyone can create a submission. Only authorized admins can read/update/delete.
     match /submissions/{submissionId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
 
-    // Notifications: Created by the system (submission form). Managed by admins.
+    // Notifications: Created by the system. Managed by authorized admins.
     match /notifications/{notificationId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
   }
 }
