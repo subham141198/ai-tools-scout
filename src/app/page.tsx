@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { PROFESSIONS, getTrendingTools } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
@@ -26,6 +25,7 @@ import {
   Loader2
 } from "lucide-react";
 import { aiSearch } from "@/ai/flows/ai-search-flow";
+import { aiTrendingTools } from "@/ai/flows/ai-trending-tools-flow";
 import { AITool } from "@/lib/types";
 import {
   DropdownMenu,
@@ -45,21 +45,44 @@ export default function HomePage() {
   const [searchResults, setSearchResults] = useState<AITool[] | null>(null);
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTrendingLoading, setIsTrendingLoading] = useState(false);
   const [navigatingProfessionId, setNavigatingProfessionId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadInitialData() {
-      const trending = await getTrendingTools(db);
-      setTrendingTools(trending);
+    async function loadTrending() {
+      setIsTrendingLoading(true);
+      try {
+        // First try Firestore
+        const dbTools = await getTrendingTools(db);
+        
+        // If Firestore has no featured tools (fresh project), consult AI
+        if (!dbTools || dbTools.length === 0 || dbTools[0].id === 't1') {
+          const aiResult = await aiTrendingTools();
+          const tools = aiResult.tools.map(t => ({
+            ...t,
+            slug: t.id,
+            createdAt: new Date().toISOString(),
+            featured: true,
+            approved: true
+          })) as AITool[];
+          setTrendingTools(tools);
+          setAiExplanation(aiResult.marketSummary);
+        } else {
+          setTrendingTools(dbTools);
+        }
+      } catch (error) {
+        console.error("Error loading trending tools:", error);
+      } finally {
+        setIsTrendingLoading(false);
+      }
     }
-    loadInitialData();
+    loadTrending();
   }, [db]);
 
   useEffect(() => {
     async function handleSearch() {
       if (!q) {
         setSearchResults(null);
-        setAiExplanation(null);
         return;
       }
 
@@ -282,15 +305,23 @@ export default function HomePage() {
                       <TrendingUp className="h-7 w-7 text-primary" />
                       Featured AI Tools
                     </h2>
-                    <p className="text-muted-foreground">High-performance tools recommended by our editors.</p>
+                    <p className="text-muted-foreground">High-performance tools recommended by our global AI researcher.</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {trendingTools.map(tool => (
-                    <ToolCard key={tool.id} tool={tool} />
-                  ))}
-                </div>
+                {isTrendingLoading ? (
+                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {[1, 2, 3, 4, 5, 6].map((i) => (
+                       <ToolCardSkeleton key={i} />
+                     ))}
+                   </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {trendingTools.map(tool => (
+                      <ToolCard key={tool.id} tool={tool} />
+                    ))}
+                  </div>
+                )}
               </section>
 
               <AdPlacement type="responsive" className="my-12" />
