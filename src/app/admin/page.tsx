@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Check, X, ExternalLink, ShieldCheck, Bell, History, LogIn, Lock } from "lucide-react";
+import { Loader2, Check, X, ExternalLink, ShieldCheck, Bell, History, LogIn, Lock, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -34,8 +34,10 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  // Authorization Check
-  const isAdmin = user && ADMIN_EMAILS.includes(user.email || "");
+  // Deep Authorization & Provider Check
+  const isGoogleUser = user?.providerData.some(p => p.providerId === 'google.com');
+  const isEmailVerified = user?.emailVerified;
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email || "") && isGoogleUser && isEmailVerified;
 
   // Fetch pending submissions (only if admin)
   const submissionsQuery = isAdmin ? query(
@@ -55,6 +57,8 @@ export default function AdminDashboard() {
   const handleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      // Enforce account selection
+      provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider);
     } catch (error) {
       console.error("Auth error:", error);
@@ -71,7 +75,7 @@ export default function AdminDashboard() {
         </div>
         <div className="space-y-2 max-w-sm">
           <h1 className="text-3xl font-black">Moderator Access</h1>
-          <p className="text-muted-foreground font-medium">Please sign in with your administrative account to manage submissions and notifications.</p>
+          <p className="text-muted-foreground font-medium">Please sign in with your administrative Google account to manage submissions.</p>
         </div>
         <Button size="lg" className="rounded-full px-8 gap-2 font-bold" onClick={handleSignIn}>
           <LogIn className="h-5 w-5" />
@@ -84,17 +88,33 @@ export default function AdminDashboard() {
     );
   }
 
-  // Unauthorized view
+  // Unauthorized view (either not in list, not google, or not verified)
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-6 text-center bg-background px-4">
         <div className="w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
           <Lock className="h-10 w-10 text-destructive" />
         </div>
-        <div className="space-y-2 max-w-sm">
+        <div className="space-y-4 max-w-md">
           <h1 className="text-3xl font-black">Access Denied</h1>
-          <p className="text-muted-foreground font-medium">
-            The account <strong>{user.email}</strong> does not have moderator privileges. Please contact the site owner or switch to an authorized account.
+          
+          <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-6 text-left space-y-4">
+            <div className="flex items-start gap-3">
+              <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${ADMIN_EMAILS.includes(user.email || "") ? 'bg-emerald-500' : 'bg-destructive'}`} />
+              <p className="text-sm font-medium">Email <strong>{user.email}</strong> {ADMIN_EMAILS.includes(user.email || "") ? 'is on the whitelist.' : 'is not an authorized admin.'}</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${isGoogleUser ? 'bg-emerald-500' : 'bg-destructive'}`} />
+              <p className="text-sm font-medium">Authentication via Google: {isGoogleUser ? 'Verified' : 'Failed'}</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${isEmailVerified ? 'bg-emerald-500' : 'bg-destructive'}`} />
+              <p className="text-sm font-medium">Email Verification Status: {isEmailVerified ? 'Verified' : 'Unverified'}</p>
+            </div>
+          </div>
+          
+          <p className="text-muted-foreground font-medium text-sm">
+            Please contact the system administrator if you believe this is an error.
           </p>
         </div>
         <div className="flex gap-4">
@@ -203,11 +223,14 @@ export default function AdminDashboard() {
                 <ShieldCheck className="h-10 w-10 text-primary" />
                 Moderation Hub
               </h1>
-              <p className="text-muted-foreground font-medium">Review pending AI tool submissions and track platform activity.</p>
+              <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-xs font-bold w-fit border border-emerald-100">
+                <Check className="h-3 w-3" />
+                Secure Admin Session
+              </div>
             </div>
             <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border shadow-sm">
               <div className="px-4 text-right">
-                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Signed In As</p>
+                <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Authorized As</p>
                 <p className="text-sm font-bold truncate max-w-[150px]">{user.email}</p>
               </div>
               <Button variant="ghost" size="sm" onClick={() => auth.signOut()} className="rounded-xl">Sign Out</Button>
