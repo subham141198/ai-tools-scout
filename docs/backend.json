@@ -48,6 +48,19 @@
         "submittedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["toolName", "websiteUrl", "contactEmail"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A system notification for admins.",
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["new_submission", "approval", "rejection"] },
+        "targetId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["message", "type", "createdAt"]
     }
   },
   "auth": {
@@ -65,6 +78,10 @@
     "/submissions/{submissionId}": {
       "schema": { "$ref": "#/backend/entities/Submission" },
       "description": "User submissions pending review."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/backend/entities/Notification" },
+      "description": "System notifications for monitoring activity."
     }
   }
 }

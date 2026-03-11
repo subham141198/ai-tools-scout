@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Loader2, Send } from "lucide-react";
 import { aiSeoContentGenerator } from "@/ai/flows/ai-seo-content-generator-flow";
-import { useFirestore, useAuth } from "@/firebase";
+import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -24,7 +24,6 @@ export default function SubmitToolPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const db = useFirestore();
-  const { auth } = useAuth();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -99,9 +98,19 @@ export default function SubmitToolPage() {
     };
 
     const submissionsRef = collection(db, 'submissions');
+    const notificationsRef = collection(db, 'notifications');
     
     addDoc(submissionsRef, submissionData)
-      .then(() => {
+      .then((docRef) => {
+        // Send internal notification to Admin
+        addDoc(notificationsRef, {
+          message: `New AI Tool Submission: ${formData.name}`,
+          type: 'new_submission',
+          targetId: docRef.id,
+          createdAt: serverTimestamp(),
+          read: false
+        });
+
         setIsSubmitting(false);
         setFormData({
           name: "",
@@ -117,7 +126,7 @@ export default function SubmitToolPage() {
         });
         toast({
           title: "Tool Submitted!",
-          description: "Your submission is pending review. Thank you for contributing to the community.",
+          description: "Your submission is pending review. You will be notified at your contact email upon approval.",
         });
       })
       .catch(async (serverError) => {
@@ -191,6 +200,7 @@ export default function SubmitToolPage() {
                     value={formData.contactEmail}
                     onChange={e => setFormData(f => ({ ...f, contactEmail: e.target.value }))}
                   />
+                  <p className="text-[10px] text-muted-foreground">We'll send a notification to this address once reviewed.</p>
                 </div>
 
                 <div className="space-y-2">

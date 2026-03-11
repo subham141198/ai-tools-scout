@@ -19,5 +19,11 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
     }
+
+    // Notifications can be created by the submission form. Admins can read/delete them.
+    match /notifications/{notificationId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
   }
 }
