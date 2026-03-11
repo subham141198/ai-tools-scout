@@ -77,7 +77,7 @@ Your task is to generate:
 Ensure all generated content is unique, highly relevant, avoids keyword stuffing, and naturally incorporates important keywords and phrases. Focus on providing value to the user and clearly explaining the topic.
 
 ---
-{{#eq context "tool"}}
+{{#if toolName}}
 Generate content for an AI Tool page. Use a formal yet engaging tone.
 
 AI Tool Name: {{{toolName}}}
@@ -108,10 +108,9 @@ For the long description (minimum 800 words), ensure it includes the following s
 8.  **Pricing Model** (General information about typical AI tool pricing, if applicable, or encourage visiting the site).
 9.  **Getting Started with {{toolName}}** (Basic steps for new users).
 10. **The Future of AI in [Relevant Category/Profession]** (Connect the tool to broader industry trends).
----
-{{/eq}}
+{{/if}}
 
-{{#eq context "profession"}}
+{{#if professionName}}
 Generate content for an AI Tools Profession Category page. Use an informative and forward-looking tone.
 
 Profession Name: {{{professionName}}}
@@ -133,10 +132,9 @@ For the long description (minimum 800 words), ensure it includes the following s
 6.  **Real-World Impact & Case Studies** (Hypothetical or general examples of AI success stories).
 7.  **Future Trends & Outlook** (What does the future hold for {{professionName}} with AI?)
 8.  **Becoming AI-Proficient in {{professionName}}** (Advice on adapting and leveraging AI).
----
-{{/eq}}
+{{/if}}
 
-{{#eq context "workCategory"}}
+{{#if workCategoryName}}
 Generate content for an AI Tools Work Category page. Use an analytical and practical tone.
 
 Work Category Name: {{{workCategoryName}}}
@@ -158,8 +156,7 @@ For the long description (minimum 800 words), ensure it includes the following s
 6.  **Spotlight on Example Tools** (Briefly describe how the example tools provided fit into this category).
 7.  **The Evolution of {{workCategoryName}} with AI** (Future prospects and emerging trends).
 8.  **Choosing the Right AI Tools** (Guidance on evaluating and selecting AI solutions).
----
-{{/eq}}
+{{/if}}
 
 Your output must be a JSON object matching the following schema. Do not include any other text outside the JSON.
 `,
