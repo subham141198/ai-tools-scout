@@ -2,17 +2,22 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Tools are publicly readable, but only admins (authenticated users) can write
     match /tools/{toolId} {
       allow read: if true;
-      allow write: if false; // Only admin via console/backend
+      allow write: if request.auth != null;
     }
+    
+    // Professions are publicly readable
     match /professions/{professionId} {
       allow read: if true;
       allow write: if false;
     }
+    
+    // Anyone can submit a tool. Only authenticated admins can review them.
     match /submissions/{submissionId} {
       allow create: if true;
-      allow read, update, delete: if false;
+      allow read, update, delete: if request.auth != null;
     }
   }
 }

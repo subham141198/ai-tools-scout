@@ -1,3 +1,7 @@
+
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PROFESSIONS, getTrendingTools } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
@@ -17,7 +21,8 @@ import {
   Twitter,
   Github,
   Linkedin,
-  Instagram
+  Instagram,
+  Loader2
 } from "lucide-react";
 import { aiSearch } from "@/ai/flows/ai-search-flow";
 import { AITool } from "@/lib/types";
@@ -27,35 +32,57 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSearchParams } from "next/navigation";
+import { useFirestore } from "@/firebase";
 
-export default async function HomePage({ 
-  searchParams 
-}: { 
-  searchParams: Promise<{ q?: string }> 
-}) {
-  const { q } = await searchParams;
-  const trendingTools = await getTrendingTools();
-  
-  let searchResults: AITool[] | null = null;
-  let aiExplanation: string | null = null;
+export default function HomePage() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get('q');
+  const db = useFirestore();
 
-  if (q) {
-    try {
-      const aiResult = await aiSearch({ query: q });
-      searchResults = aiResult.recommendedTools.map(tool => ({
-        ...tool,
-        slug: tool.id,
-        createdAt: new Date().toISOString(),
-        featured: false,
-        approved: true,
-        logoUrl: tool.logoUrl || `https://picsum.photos/seed/${tool.id}/200/200`
-      })) as AITool[];
-      
-      aiExplanation = aiResult.aiExplanation;
-    } catch (error) {
-      console.error("AI Search Error:", error);
+  const [trendingTools, setTrendingTools] = useState<AITool[]>([]);
+  const [searchResults, setSearchResults] = useState<AITool[] | null>(null);
+  const [aiExplanation, setAiExplanation] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadInitialData() {
+      const trending = await getTrendingTools(db);
+      setTrendingTools(trending);
     }
-  }
+    loadInitialData();
+  }, [db]);
+
+  useEffect(() => {
+    async function handleSearch() {
+      if (!q) {
+        setSearchResults(null);
+        setAiExplanation(null);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const aiResult = await aiSearch({ query: q });
+        const results = aiResult.recommendedTools.map(tool => ({
+          ...tool,
+          slug: tool.id,
+          createdAt: new Date().toISOString(),
+          featured: false,
+          approved: true,
+          logoUrl: tool.logoUrl || `https://picsum.photos/seed/${tool.id}/200/200`
+        })) as AITool[];
+        
+        setSearchResults(results);
+        setAiExplanation(aiResult.aiExplanation);
+      } catch (error) {
+        console.error("AI Search Error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    handleSearch();
+  }, [q]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -106,27 +133,29 @@ export default async function HomePage({
                     AI Solutions for <span className="text-primary italic">"{q}"</span>
                   </h1>
                   <p className="text-muted-foreground font-medium">
-                    Found {searchResults?.length || 0} tools matching your global intelligence query
+                    {isLoading ? "Consulting Global Intelligence..." : `Found ${searchResults?.length || 0} tools matching your global query`}
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="rounded-full h-10 px-5 gap-2 font-semibold">
-                        Sort by: Top Rated
-                        <ChevronDown className="h-4 w-4 opacity-50" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Top Rated</DropdownMenuItem>
-                      <DropdownMenuItem>Newest</DropdownMenuItem>
-                      <DropdownMenuItem>Popular</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button variant="ghost" size="sm" asChild className="text-muted-foreground">
-                    <Link href="/">Clear All</Link>
-                  </Button>
-                </div>
+                {!isLoading && (
+                  <div className="flex items-center gap-3">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="rounded-full h-10 px-5 gap-2 font-semibold">
+                          Sort by: Top Rated
+                          <ChevronDown className="h-4 w-4 opacity-50" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>Top Rated</DropdownMenuItem>
+                        <DropdownMenuItem>Newest</DropdownMenuItem>
+                        <DropdownMenuItem>Popular</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button variant="ghost" size="sm" asChild className="text-muted-foreground">
+                      <Link href="/">Clear All</Link>
+                    </Button>
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col lg:flex-row gap-10">
@@ -169,7 +198,7 @@ export default async function HomePage({
                         <div className="flex flex-wrap gap-2">
                           {PROFESSIONS.slice(0, 8).map(prof => (
                             <Badge key={prof.id} variant="secondary" className="hover:bg-primary hover:text-white transition-colors cursor-pointer bg-muted/50 text-[10px] font-bold py-1 px-3 rounded-full uppercase">
-                              {prof.name}
+                              <Link href={`/profession/${prof.slug}`}>{prof.name}</Link>
                             </Badge>
                           ))}
                         </div>
@@ -181,44 +210,59 @@ export default async function HomePage({
                 </aside>
 
                 <div className="flex-1 space-y-8">
-                  {aiExplanation && (
-                    <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex gap-4 items-start animate-in fade-in slide-in-from-top-4">
-                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
-                        <Sparkles className="h-5 w-5 text-primary-foreground" />
+                  {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-24 gap-6 bg-muted/10 rounded-[3rem] border-2 border-dashed">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
+                        <Loader2 className="h-16 w-16 animate-spin text-primary relative z-10" />
                       </div>
-                      <div className="space-y-1">
-                        <h4 className="font-bold text-sm text-primary uppercase tracking-wider flex items-center gap-2">
-                          Gemini Market Analysis
-                        </h4>
-                        <p className="text-foreground leading-relaxed italic text-sm md:text-base">
-                          "{aiExplanation}"
-                        </p>
+                      <div className="text-center space-y-2">
+                        <p className="text-xl font-black">Scout Intelligence is researching...</p>
+                        <p className="text-muted-foreground max-w-xs mx-auto">Mapping the global AI landscape for "{q}"</p>
                       </div>
                     </div>
-                  )}
+                  ) : (
+                    <>
+                      {aiExplanation && (
+                        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex gap-4 items-start animate-in fade-in slide-in-from-top-4">
+                          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+                            <Sparkles className="h-5 w-5 text-primary-foreground" />
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="font-bold text-sm text-primary uppercase tracking-wider flex items-center gap-2">
+                              Gemini Market Analysis
+                            </h4>
+                            <p className="text-foreground leading-relaxed italic text-sm md:text-base">
+                              "{aiExplanation}"
+                            </p>
+                          </div>
+                        </div>
+                      )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {searchResults && searchResults.length > 0 ? (
-                      searchResults.map(tool => (
-                        <ToolCard key={tool.id} tool={tool} />
-                      ))
-                    ) : (
-                      <div className="col-span-full py-24 text-center bg-muted/20 rounded-3xl border-2 border-dashed flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
-                          <SearchIcon className="h-8 w-8 text-muted-foreground" />
-                        </div>
-                        <div className="space-y-2">
-                          <p className="font-bold text-xl">No tools found for your query</p>
-                          <p className="text-muted-foreground max-w-sm mx-auto">
-                            Our AI intelligence couldn't find a perfect match. Try broadening your search or exploring by role.
-                          </p>
-                        </div>
-                        <Button asChild className="rounded-full px-8">
-                          <Link href="/">Reset Search</Link>
-                        </Button>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {searchResults && searchResults.length > 0 ? (
+                          searchResults.map(tool => (
+                            <ToolCard key={tool.id} tool={tool} />
+                          ))
+                        ) : (
+                          <div className="col-span-full py-24 text-center bg-muted/20 rounded-3xl border-2 border-dashed flex flex-col items-center gap-4">
+                            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+                              <SearchIcon className="h-8 w-8 text-muted-foreground" />
+                            </div>
+                            <div className="space-y-2">
+                              <p className="font-bold text-xl">No tools found for your query</p>
+                              <p className="text-muted-foreground max-w-sm mx-auto">
+                                Our AI intelligence couldn't find a perfect match. Try broadening your search or exploring by role.
+                              </p>
+                            </div>
+                            <Button asChild className="rounded-full px-8">
+                              <Link href="/">Reset Search</Link>
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </>
+                  )}
                   
                   <AdPlacement type="responsive" />
                 </div>
@@ -313,7 +357,7 @@ export default async function HomePage({
             <ul className="space-y-3 text-sm font-medium text-muted-foreground">
               <li><Link href="/compare" className="hover:text-primary transition-colors">Comparison Engine</Link></li>
               <li><Link href="/submit-tool" className="hover:text-primary transition-colors">List Your Tool</Link></li>
-              <li><Link href="/professions" className="hover:text-primary transition-colors">All Professions</Link></li>
+              <li><Link href="/admin" className="hover:text-primary transition-colors">Moderator Admin</Link></li>
             </ul>
           </div>
 

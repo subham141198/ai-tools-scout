@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
-import { PROFESSIONS, WORK_CATEGORIES } from "@/lib/db";
+import { PROFESSIONS } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,11 +14,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles, Loader2, Send } from "lucide-react";
 import { aiSeoContentGenerator } from "@/ai/flows/ai-seo-content-generator-flow";
+import { useFirestore, useAuth } from "@/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export default function SubmitToolPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const db = useFirestore();
+  const { auth } = useAuth();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -76,17 +83,52 @@ export default function SubmitToolPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast({
-        title: "Tool Submitted",
-        description: "Your submission is pending review. Thank you!",
+
+    const submissionData = {
+      ...formData,
+      status: 'pending',
+      submittedAt: serverTimestamp(),
+      logoUrl: `https://picsum.photos/seed/${formData.name.toLowerCase().replace(/\s+/g, '-')}/400/400`,
+      rating: 0,
+      featured: false,
+      approved: false,
+      slug: formData.name.toLowerCase().replace(/\s+/g, '-')
+    };
+
+    const submissionsRef = collection(db, 'submissions');
+    
+    addDoc(submissionsRef, submissionData)
+      .then(() => {
+        setIsSubmitting(false);
+        setFormData({
+          name: "",
+          websiteUrl: "",
+          shortDescription: "",
+          longDescription: "",
+          seoTitle: "",
+          metaDescription: "",
+          pricingModel: "Freemium",
+          contactEmail: "",
+          professions: [] as string[],
+          workTypes: [] as string[]
+        });
+        toast({
+          title: "Tool Submitted!",
+          description: "Your submission is pending review. Thank you for contributing to the community.",
+        });
+      })
+      .catch(async (serverError) => {
+        setIsSubmitting(false);
+        const permissionError = new FirestorePermissionError({
+          path: submissionsRef.path,
+          operation: 'create',
+          requestResourceData: submissionData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
-    }, 2000);
   };
 
   const toggleProfession = (slug: string) => {
@@ -137,6 +179,18 @@ export default function SubmitToolPage() {
                       onChange={e => setFormData(f => ({ ...f, websiteUrl: e.target.value }))}
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="contactEmail">Contact Email</Label>
+                  <Input 
+                    id="contactEmail" 
+                    type="email" 
+                    placeholder="your@email.com" 
+                    required 
+                    value={formData.contactEmail}
+                    onChange={e => setFormData(f => ({ ...f, contactEmail: e.target.value }))}
+                  />
                 </div>
 
                 <div className="space-y-2">
