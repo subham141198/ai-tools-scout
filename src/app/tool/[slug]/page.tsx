@@ -1,3 +1,4 @@
+
 import { getToolBySlug, getTrendingTools } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
 import { AdPlacement } from "@/components/AdPlacement";
@@ -175,7 +176,7 @@ export default async function ToolDetailPage({ params }: Props) {
                  </div>
               </section>
 
-              <AdPlacement type="banner" />
+              <AdPlacement type="banner" slot="6062113214" />
 
               {/* Description & Details */}
               <div className="space-y-8 prose prose-slate max-w-none mt-10">
@@ -246,7 +247,7 @@ export default async function ToolDetailPage({ params }: Props) {
               </div>
             </article>
 
-            <AdPlacement type="responsive" />
+            <AdPlacement type="responsive" slot="6062113214" />
             
             {/* Similar Tools */}
             <section className="py-10">
@@ -304,7 +305,7 @@ export default async function ToolDetailPage({ params }: Props) {
                 </Button>
               </div>
 
-              <AdPlacement type="sidebar" className="mt-8" />
+              <AdPlacement type="sidebar" slot="6062113214" className="mt-8" />
             </div>
           </aside>
         </div>

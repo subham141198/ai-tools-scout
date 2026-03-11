@@ -1,3 +1,4 @@
+
 import { PROFESSIONS } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
 import { ToolCard } from "@/components/ToolCard";
@@ -131,7 +132,7 @@ export default async function ProfessionPage({ params }: Props) {
           </div>
         </header>
 
-        <AdPlacement type="banner" />
+        <AdPlacement type="banner" slot="6062113214" />
 
         <div className="flex flex-col lg:flex-row gap-10">
           {/* PLP Sidebar */}
@@ -222,7 +223,7 @@ export default async function ProfessionPage({ params }: Props) {
             </div>
 
             <div className="pt-12">
-              <AdPlacement type="responsive" />
+              <AdPlacement type="responsive" slot="6062113214" />
             </div>
           </div>
         </div>

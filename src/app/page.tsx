@@ -232,7 +232,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   
-                  <AdPlacement type="sidebar" />
+                  <AdPlacement type="sidebar" slot="6062113214" />
                 </aside>
 
                 <div className="flex-1 space-y-8">
@@ -291,13 +291,13 @@ export default function HomePage() {
                     </>
                   )}
                   
-                  <AdPlacement type="responsive" />
+                  <AdPlacement type="responsive" slot="6062113214" />
                 </div>
               </div>
             </div>
           ) : (
             <>
-              <AdPlacement type="banner" className="my-12" />
+              <AdPlacement type="banner" slot="6062113214" className="my-12" />
 
               <section id="trending" className="py-12">
                 <div className="flex items-center justify-between mb-8 pb-4 border-b">
@@ -325,7 +325,7 @@ export default function HomePage() {
                 )}
               </section>
 
-              <AdPlacement type="responsive" className="my-12" />
+              <AdPlacement type="responsive" slot="6062113214" className="my-12" />
 
               <section className="py-16 bg-muted/30 -mx-4 px-4 rounded-[3rem] border">
                 <div className="text-center mb-12">
@@ -358,7 +358,7 @@ export default function HomePage() {
                 </div>
               </section>
 
-              <AdPlacement type="banner" className="my-12" />
+              <AdPlacement type="banner" slot="6062113214" className="my-12" />
             </>
           )}
         </div>
