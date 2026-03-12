@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
 
 interface AdPlacementProps {
@@ -12,17 +11,34 @@ interface AdPlacementProps {
 
 export function AdPlacement({ className, type = 'responsive', slot }: AdPlacementProps) {
   const publisherId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;
+  const adRef = useRef<HTMLModElement>(null);
 
   useEffect(() => {
-    // Push the ad to the window if AdSense is loaded and we have a publisher ID
-    if (typeof window !== 'undefined' && (window as any).adsbygoogle && publisherId) {
-      try {
-        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
-      } catch (e) {
-        console.error('AdSense error:', e);
-      }
+    // Only proceed if we have a valid window context, AdSense script is loaded, and we have credentials
+    if (typeof window !== 'undefined' && (window as any).adsbygoogle && publisherId && slot) {
+      let retryCount = 0;
+      const MAX_RETRIES = 5;
+
+      const pushAd = () => {
+        try {
+          // AdSense needs the container to have a non-zero width/height
+          // If the width is 0 (e.g. initial render or hidden element), we wait and retry
+          if (adRef.current && adRef.current.offsetWidth > 0) {
+            ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+          } else if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            setTimeout(pushAd, 200 * retryCount);
+          }
+        } catch (e) {
+          // Catching push errors to prevent app crashes from ad blockers or script failures
+        }
+      };
+
+      // Small delay to ensure the DOM layout has settled
+      const timeoutId = setTimeout(pushAd, 100);
+      return () => clearTimeout(timeoutId);
     }
-  }, [publisherId]);
+  }, [publisherId, slot]);
 
   const heights = {
     banner: 'h-[90px]',
@@ -45,10 +61,11 @@ export function AdPlacement({ className, type = 'responsive', slot }: AdPlacemen
   }
 
   return (
-    <div className={cn("my-8 overflow-hidden flex justify-center", className)}>
+    <div className={cn("my-8 overflow-hidden flex justify-center w-full", className)}>
       <ins
+        ref={adRef}
         className="adsbygoogle"
-        style={{ display: 'block' }}
+        style={{ display: 'block', width: '100%' }}
         data-ad-client={publisherId}
         data-ad-slot={slot}
         data-ad-format="auto"
