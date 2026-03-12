@@ -20,8 +20,12 @@ const TrendingToolSchema = z.object({
 });
 
 const AiTrendingToolsOutputSchema = z.object({
-  tools: z.array(TrendingToolSchema).describe('List of trending AI tools found globally.'),
-  marketSummary: z.string().describe('A brief summary of current AI market trends.'),
+  tools: z
+    .array(TrendingToolSchema)
+    .describe('List of trending AI tools found globally.'),
+  marketSummary: z
+    .string()
+    .describe('A brief summary of current AI market trends.'),
 });
 
 export type AiTrendingToolsOutput = z.infer<typeof AiTrendingToolsOutputSchema>;
