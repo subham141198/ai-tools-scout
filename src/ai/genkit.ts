@@ -5,7 +5,7 @@ import { groq } from 'genkitx-groq';
  * Global Genkit instance configured exclusively with Groq.
  * Using Llama 3 models via Groq for high-speed, free-tier friendly intelligence.
  * 
- * NOTE: In Genkit 1.x, we pass the plugin function reference to the plugins array.
+ * In Genkit 1.x, the groq plugin from genkitx-groq is registered as an object.
  */
 export const ai = genkit({
   plugins: [
