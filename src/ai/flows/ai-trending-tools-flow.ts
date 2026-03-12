@@ -32,7 +32,7 @@ export async function aiTrendingTools(): Promise<AiTrendingToolsOutput> {
 
 const aiTrendingToolsPrompt = ai.definePrompt({
   name: 'aiTrendingToolsPrompt',
-  model: 'groq/llama-3.3-70b-versatile',
+  model: 'groq/llama-3.1-8b-instant',
   output: { schema: AiTrendingToolsOutputSchema },
   prompt: `You are a world-class AI market researcher for "Ainexa". Identify 6 of the most trending AI tools available globally right now.
 
