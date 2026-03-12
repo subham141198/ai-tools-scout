@@ -124,8 +124,8 @@ export default function HomePage() {
                 <Sparkles className="h-3.5 w-3.5" />
                 Next-Gen AI Intelligence Platform
               </div>
-              <h1 className="text-4xl md:text-6xl font-headline font-black tracking-tighter mb-8 max-w-5xl mx-auto leading-none">
-                Unlock the Power of <span className="brand-text-gradient italic">Intelligence</span>
+              <h1 className="text-4xl md:text-6xl font-headline font-black tracking-tighter mb-8 max-w-5xl mx-auto leading-tight">
+                Unlock the Power of <span className="brand-text-gradient italic px-2">Intelligence</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
                 Ainexa maps the global AI ecosystem to provide you with curated tools that elevate your specific workflow to superhuman levels.
@@ -152,8 +152,8 @@ export default function HomePage() {
                     <SearchIcon className="h-4 w-4" />
                     Search Results
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-headline font-black">
-                    Ainexa Intelligence for <span className="brand-text-gradient italic">"{q}"</span>
+                  <h1 className="text-3xl md:text-4xl font-headline font-black leading-tight">
+                    Ainexa <span className="brand-text-gradient italic px-1">Intelligence</span> for <span className="brand-text-gradient italic px-1">"{q}"</span>
                   </h1>
                   <p className="text-muted-foreground font-medium">
                     {isLoading ? "Consulting Global Scout..." : `Found ${searchResults?.length || 0} tools matching your global query`}
@@ -286,7 +286,7 @@ export default function HomePage() {
 
               <section className="py-24 bg-muted/30 -mx-4 px-4 rounded-[4rem] border border-primary/10 mb-20">
                 <div className="text-center mb-16">
-                  <h2 className="text-3xl md:text-4xl font-headline font-black mb-6 leading-tight">Elite Tools for <span className="brand-text-gradient italic">Your Career</span></h2>
+                  <h2 className="text-3xl md:text-4xl font-headline font-black mb-6 leading-tight">Elite Tools for <span className="brand-text-gradient italic px-2">Your Career</span></h2>
                   <p className="text-muted-foreground max-w-2xl mx-auto text-xl font-medium">
                     Every profession is being transformed. We've mapped the top 1% of AI intelligence specifically for your professional domain.
                   </p>
