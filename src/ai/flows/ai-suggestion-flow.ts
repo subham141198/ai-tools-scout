@@ -23,11 +23,9 @@ export async function aiSuggestions(input: SuggestionInput): Promise<SuggestionO
 
 const suggestionPrompt = ai.definePrompt({
   name: 'suggestionPrompt',
+  model: 'groq/llama-3.1-8b-instant',
   input: { schema: SuggestionInputSchema },
   output: { schema: SuggestionOutputSchema },
-  config: {
-    model: 'groq/llama-3.1-8b-instant',
-  },
   prompt: `You are a search autocomplete assistant for "Ainexa".
 The user is typing: "{{query}}"
 

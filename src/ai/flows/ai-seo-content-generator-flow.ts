@@ -60,11 +60,9 @@ export async function aiSeoContentGenerator(input: AiSeoContentGeneratorInput): 
 
 const aiSeoContentGeneratorPrompt = ai.definePrompt({
   name: 'aiSeoContentGeneratorPrompt',
+  model: 'groq/llama-3.3-70b-versatile',
   input: { schema: AiSeoContentGeneratorInputSchema },
   output: { schema: AiSeoContentGeneratorOutputSchema },
-  config: {
-    model: 'groq/llama-3.3-70b-versatile',
-  },
   prompt: `You are an expert SEO content writer. Generate high-quality SEO content for an AI platform.
 
 Your task is to generate:

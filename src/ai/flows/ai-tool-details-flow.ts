@@ -34,11 +34,9 @@ export async function aiToolDetails(input: { slug: string }): Promise<AiToolDeta
 
 const aiToolDetailsPrompt = ai.definePrompt({
   name: 'aiToolDetailsPrompt',
+  model: 'groq/llama-3.3-70b-versatile',
   input: { schema: AiToolDetailsInputSchema },
   output: { schema: AiToolDetailsOutputSchema },
-  config: {
-    model: 'groq/llama-3.3-70b-versatile',
-  },
   prompt: `You are an expert tech researcher for "Ainexa". Provide deep details about the AI tool: "{{slug}}"
 
 Include:

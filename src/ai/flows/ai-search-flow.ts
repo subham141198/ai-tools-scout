@@ -37,11 +37,9 @@ export async function aiSearch(input: AiSearchInput): Promise<AiSearchOutput> {
 
 const aiSearchPrompt = ai.definePrompt({
   name: 'aiSearchPrompt',
+  model: 'groq/llama-3.3-70b-versatile',
   input: { schema: AiSearchInputSchema },
   output: { schema: AiSearchOutputSchema },
-  config: {
-    model: 'groq/llama-3.3-70b-versatile',
-  },
   prompt: `You are an expert AI search assistant for "Ainexa". 
 
 The user is looking for tools related to: "{{query}}"
