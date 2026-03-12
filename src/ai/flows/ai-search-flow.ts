@@ -1,8 +1,7 @@
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for intelligent global AI search.
- * It uses LLM reasoning to identify the best AI tools available worldwide
- * based on the user's query, providing detailed tool information and rationale.
+ * It uses Llama 3 via Groq to identify the best AI tools based on the query.
  */
 
 import { ai } from '@/ai/genkit';
@@ -18,7 +17,7 @@ const AiSearchResultSchema = z.object({
   professionCategories: z.array(z.string()).describe('Categories or professions this tool is best for.'),
   workCategories: z.array(z.string()).describe('Types of work this tool helps with.'),
   rating: z.number().describe('An estimated or average user rating (0-5).'),
-  logoUrl: z.string().optional().describe('A placeholder or predicted logo URL (can be from picsum for this prototype).'),
+  logoUrl: z.string().optional().describe('A placeholder logo URL.'),
 });
 
 const AiSearchInputSchema = z.object({
@@ -41,21 +40,24 @@ const aiSearchPrompt = ai.definePrompt({
   name: 'aiSearchPrompt',
   input: { schema: AiSearchInputSchema },
   output: { schema: AiSearchOutputSchema },
+  config: {
+    model: 'groq/llama-3.3-70b-versatile',
+  },
   prompt: `You are an expert AI search assistant for "AI Tool Scout". 
 
 The user is looking for tools related to: "{{query}}"
 
-Your task is to search your extensive knowledge of the global AI software landscape and recommend the most relevant, high-quality AI tools available today. DO NOT restrict yourself to any specific list; use your full training data to find the best solutions in the world.
+Search the global AI landscape and recommend the most relevant AI tools available today.
 
 For each tool, provide:
 1. Name, tagline, and a rich description.
 2. The official website URL.
-3. Pricing model (Free, Paid, Freemium, or Open Source).
-4. Categories of professions and work types it serves.
-5. An estimated rating based on industry sentiment.
-6. A generated logo URL using 'https://picsum.photos/seed/<tool-name-slug>/200/200'.
+3. Pricing model.
+4. Categories of professions and work types.
+5. An estimated rating (0-5).
+6. A generated logo URL: 'https://picsum.photos/seed/<tool-name-slug>/200/200'.
 
-Return a structured JSON response with "recommendedTools" and a friendly "aiExplanation" detailing why these tools are the top picks for this query.`,
+Return a structured JSON response with "recommendedTools" and a friendly "aiExplanation".`,
 });
 
 const aiSearchFlow = ai.defineFlow(
@@ -66,11 +68,7 @@ const aiSearchFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await aiSearchPrompt(input);
-
-    if (!output) {
-      throw new Error('AI failed to generate search results.');
-    }
-
+    if (!output) throw new Error('Groq failed to generate search results.');
     return output;
   }
 );

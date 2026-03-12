@@ -1,7 +1,8 @@
+
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for generating comprehensive 
- * details for any AI tool in the world.
+ * details for any AI tool using Llama 3 via Groq.
  */
 
 import { ai } from '@/ai/genkit';
@@ -36,15 +37,15 @@ const aiToolDetailsPrompt = ai.definePrompt({
   name: 'aiToolDetailsPrompt',
   input: { schema: AiToolDetailsInputSchema },
   output: { schema: AiToolDetailsOutputSchema },
-  prompt: `You are an expert tech reviewer for "AI Tool Scout". 
+  config: {
+    model: 'groq/llama-3.3-70b-versatile',
+  },
+  prompt: `You are an expert tech reviewer. Provide deep details about the AI tool: "{{slug}}"
 
-The user wants deep details about the AI tool identified by: "{{slug}}"
-
-Research your global knowledge and provide a highly detailed profile.
 Include:
-1. The real name and a catchy tagline.
-2. A comprehensive 500-word description of its purpose and impact.
-3. The real official website URL.
+1. The real name and tagline.
+2. A comprehensive description.
+3. The official website URL.
 4. Specific key features (at least 5).
 5. Honest pros and cons.
 6. Target professions and work categories.

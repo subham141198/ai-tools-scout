@@ -1,8 +1,7 @@
-
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for generating search suggestions.
- * It uses Gemini 1.5 Flash for high-speed, cost-effective autocompletion.
+ * It uses Groq's Llama 3.1 8B for lightning-fast, free autocomplete suggestions.
  */
 
 import { ai } from '@/ai/genkit';
@@ -27,9 +26,8 @@ const suggestionPrompt = ai.definePrompt({
   name: 'suggestionPrompt',
   input: { schema: SuggestionInputSchema },
   output: { schema: SuggestionOutputSchema },
-  // Use Gemini 1.5 Flash for speed and significantly higher quota limits
   config: {
-    model: 'googleai/gemini-1.5-flash',
+    model: 'groq/llama-3.1-8b-instant',
   },
   prompt: `You are a search autocomplete assistant for "AI Tool Scout".
 The user is typing: "{{query}}"
@@ -47,7 +45,6 @@ const aiSuggestionFlow = ai.defineFlow(
     outputSchema: SuggestionOutputSchema,
   },
   async (input) => {
-    // If query is too short, return empty
     if (!input.query || input.query.length < 2) {
       return { suggestions: [] };
     }
@@ -56,7 +53,7 @@ const aiSuggestionFlow = ai.defineFlow(
       const { output } = await suggestionPrompt(input);
       return output || { suggestions: [] };
     } catch (error) {
-      console.error("AI Suggestion Error:", error);
+      console.error("Groq Suggestion Error:", error);
       return { suggestions: [] };
     }
   }

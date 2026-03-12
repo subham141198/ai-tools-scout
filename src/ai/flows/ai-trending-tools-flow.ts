@@ -1,7 +1,8 @@
+
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for discovering trending AI tools.
- * It researches the current global market to find high-impact, trending AI solutions.
+ * It uses Llama 3 via Groq for high-performance market research.
  */
 
 import { ai } from '@/ai/genkit';
@@ -34,20 +35,20 @@ export async function aiTrendingTools(): Promise<AiTrendingToolsOutput> {
 const aiTrendingToolsPrompt = ai.definePrompt({
   name: 'aiTrendingToolsPrompt',
   output: { schema: AiTrendingToolsOutputSchema },
-  prompt: `You are a world-class AI market researcher for "AI Tool Scout".
-
-Your task is to identify 6 of the most trending, high-impact AI tools available globally right now (late 2024 / early 2025). 
-These should be tools that are making waves in productivity, creativity, or enterprise.
+  config: {
+    model: 'groq/llama-3.3-70b-versatile',
+  },
+  prompt: `You are a world-class AI market researcher. Identify 6 of the most trending AI tools available globally right now.
 
 For each tool, provide:
-1. Real name and a verified tagline.
-2. A short description of its impact.
-3. Its official URL.
-4. Correct pricing model.
+1. Real name and tagline.
+2. Short description.
+3. Official URL.
+4. Pricing model.
 5. A placeholder logo URL: 'https://picsum.photos/seed/<slug>/400/400'.
 6. Target professions and work categories.
 
-Include a "marketSummary" explaining why these specific tools are trending today.`,
+Include a "marketSummary" explaining these trends.`,
 });
 
 const aiTrendingToolsFlow = ai.defineFlow(
