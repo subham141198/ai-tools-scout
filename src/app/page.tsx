@@ -152,7 +152,7 @@ export default function HomePage() {
                     <SearchIcon className="h-4 w-4" />
                     Search Results
                   </div>
-                  <h1 className="text-2xl font-headline font-black">
+                  <h1 className="text-4xl font-headline font-black">
                     Ainexa Intelligence for <span className="brand-text-gradient italic">"{q}"</span>
                   </h1>
                   <p className="text-muted-foreground font-medium">

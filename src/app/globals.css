@@ -63,7 +63,7 @@
 }
 
 .brand-text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#0ea5e9] to-[#7c3aed];
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#0ea5e9] via-[#7c3aed] to-[#d946ef];
 }
 
 .ad-container {
