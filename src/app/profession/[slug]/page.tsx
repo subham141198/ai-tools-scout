@@ -106,7 +106,7 @@ export default async function ProfessionPage({ params }: Props) {
                 <LayoutGrid className="h-3 w-3" />
                 Category: Professional Tools
               </div>
-              <h1 className="text-3xl md:text-5xl font-headline font-black tracking-tight leading-none">
+              <h1 className="text-3xl md:text-4xl font-headline font-black tracking-tight leading-none">
                 Best AI Tools for <span className="brand-text-gradient italic">{profession.name}</span>
               </h1>
               <p className="text-muted-foreground text-lg max-w-2xl font-medium">

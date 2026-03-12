@@ -98,7 +98,7 @@ export default function ComparePage() {
       
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-headline font-black mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-headline font-black mb-4 tracking-tight">
             Comparison <span className="text-primary italic">Engine</span>
           </h1>
           <p className="text-muted-foreground text-lg mb-8">
@@ -125,7 +125,7 @@ export default function ComparePage() {
           </form>
         </div>
 
-        <AdPlacement type="banner" />
+        <AdPlacement type="banner" slot="6062113214" />
 
         {isLoading && selectedTools.length === 0 ? (
           <div className="py-24">
