@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for generating search suggestions.
- * It uses Groq's Llama 3.1 8B for lightning-fast, free autocomplete suggestions.
+ * It uses Groq's Llama 3.1 8B for lightning-fast autocomplete suggestions.
  */
 
 import { ai } from '@/ai/genkit';
