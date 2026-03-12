@@ -1,7 +1,6 @@
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for intelligent global AI search.
- * It uses Llama 3 via Groq to identify the best AI tools based on the query.
  */
 
 import { ai } from '@/ai/genkit';
@@ -43,7 +42,7 @@ const aiSearchPrompt = ai.definePrompt({
   config: {
     model: 'groq/llama-3.3-70b-versatile',
   },
-  prompt: `You are an expert AI search assistant for "AI Tool Scout". 
+  prompt: `You are an expert AI search assistant for "Ainexa". 
 
 The user is looking for tools related to: "{{query}}"
 
@@ -68,7 +67,7 @@ const aiSearchFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await aiSearchPrompt(input);
-    if (!output) throw new Error('Groq failed to generate search results.');
+    if (!output) throw new Error('AI failed to generate search results.');
     return output;
   }
 );

@@ -1,7 +1,6 @@
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for discovering trending AI tools.
- * It uses Llama 3 via Groq for high-performance market research.
  */
 
 import { ai } from '@/ai/genkit';
@@ -37,7 +36,7 @@ const aiTrendingToolsPrompt = ai.definePrompt({
   config: {
     model: 'groq/llama-3.3-70b-versatile',
   },
-  prompt: `You are a world-class AI market researcher. Identify 6 of the most trending AI tools available globally right now.
+  prompt: `You are a world-class AI market researcher for "Ainexa". Identify 6 of the most trending AI tools available globally right now.
 
 For each tool, provide:
 1. Real name and tagline.

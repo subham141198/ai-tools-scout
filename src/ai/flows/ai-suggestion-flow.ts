@@ -1,7 +1,6 @@
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for generating search suggestions.
- * It uses Groq's Llama 3.1 8B for lightning-fast autocomplete suggestions.
  */
 
 import { ai } from '@/ai/genkit';
@@ -29,11 +28,11 @@ const suggestionPrompt = ai.definePrompt({
   config: {
     model: 'groq/llama-3.1-8b-instant',
   },
-  prompt: `You are a search autocomplete assistant for "AI Tool Scout".
+  prompt: `You are a search autocomplete assistant for "Ainexa".
 The user is typing: "{{query}}"
 
 Predict 5 common and relevant search terms related to AI tools, professions, or productivity tasks that match this input. 
-Keep suggestions short (2-4 words) and high-impact.
+Keep suggestions short (2-4 words).
 
 Return only the suggestions in the specified JSON format.`,
 });
@@ -53,7 +52,7 @@ const aiSuggestionFlow = ai.defineFlow(
       const { output } = await suggestionPrompt(input);
       return output || { suggestions: [] };
     } catch (error) {
-      console.error("Groq Suggestion Error:", error);
+      console.error("AI Suggestion Error:", error);
       return { suggestions: [] };
     }
   }

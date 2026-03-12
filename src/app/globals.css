@@ -4,27 +4,27 @@
 
 @layer base {
   :root {
-    /* Colors strictly aligned with the Ainexa Logo (Cyan -> Purple -> Magenta) */
+    /* Updated theme colors based on Ainexa logo */
     --background: 220 33% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 271 76% 53%; /* Purple from logo */
+    --primary: 271 76% 53%; /* Purple-violet from logo */
     --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222 47% 11%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 199 89% 48%; /* Cyan/Blue from logo */
+    --accent: 199 89% 48%; /* Cyan-blue from logo */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 271 76% 53%;
-    --radius: 1rem;
+    --radius: 1.25rem;
   }
 }
 
@@ -42,7 +42,8 @@
 }
 
 .brand-text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#0ea5e9] via-[#7c3aed] to-[#d946ef] py-1 px-1;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#0ea5e9] via-[#7c3aed] to-[#d946ef] inline-block px-1;
+  line-height: 1.4; /* Prevents italic clipping */
 }
 
 .ad-container {

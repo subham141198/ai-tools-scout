@@ -1,7 +1,7 @@
 'use server';
 /**
  * @fileOverview This file defines a Genkit flow for generating comprehensive 
- * details for any AI tool using Llama 3 via Groq.
+ * details for any AI tool.
  */
 
 import { ai } from '@/ai/genkit';
@@ -39,7 +39,7 @@ const aiToolDetailsPrompt = ai.definePrompt({
   config: {
     model: 'groq/llama-3.3-70b-versatile',
   },
-  prompt: `You are an expert tech reviewer. Provide deep details about the AI tool: "{{slug}}"
+  prompt: `You are an expert tech researcher for "Ainexa". Provide deep details about the AI tool: "{{slug}}"
 
 Include:
 1. The real name and tagline.

@@ -25,27 +25,26 @@ export function AinexaLogo({ className, showText = true }: AinexaLogoProps) {
             </linearGradient>
           </defs>
           
-          {/* Stylised "A" Body inspired by the node network */}
+          {/* Main "A" geometry matching uploaded logo */}
           <path
             d="M50 15L85 85H70L50 45L30 85H15L50 15Z"
             fill="url(#ainexa-gradient)"
           />
           
-          {/* Node connections from the image */}
+          {/* Node network connections */}
           <circle cx="50" cy="15" r="5" fill="white" />
           <circle cx="22" cy="70" r="4" fill="white" />
           <circle cx="78" cy="70" r="4" fill="white" />
           <circle cx="40" cy="55" r="4" fill="white" />
           <circle cx="60" cy="55" r="4" fill="white" />
           
-          {/* Connecting lines between nodes inside the A */}
           <path d="M50 15L40 55" stroke="white" strokeWidth="2" strokeOpacity="0.8" />
           <path d="M50 15L60 55" stroke="white" strokeWidth="2" strokeOpacity="0.8" />
           <path d="M40 55H60" stroke="white" strokeWidth="2" strokeOpacity="0.8" />
           <path d="M40 55L22 70" stroke="white" strokeWidth="2" strokeOpacity="0.8" />
           <path d="M60 55L78 70" stroke="white" strokeWidth="2" strokeOpacity="0.8" />
 
-          {/* Sparkle effect on the top right as seen in logo */}
+          {/* Signature Sparkle */}
           <path
             d="M75 15C75 15 78 22 85 22C78 22 75 29 75 29C75 29 72 22 65 22C72 22 75 15 75 15Z"
             fill="white"
