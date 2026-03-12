@@ -124,10 +124,10 @@ export default function HomePage() {
                 <Sparkles className="h-3.5 w-3.5" />
                 Next-Gen AI Intelligence Platform
               </div>
-              <h1 className="text-5xl md:text-7xl font-headline font-black tracking-tighter mb-8 max-w-5xl mx-auto leading-none">
+              <h1 className="text-4xl md:text-6xl font-headline font-black tracking-tighter mb-8 max-w-5xl mx-auto leading-none">
                 Unlock the Power of <span className="brand-text-gradient italic">Intelligence</span>
               </h1>
-              <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
+              <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto font-medium leading-relaxed">
                 Ainexa maps the global AI ecosystem to provide you with curated tools that elevate your specific workflow to superhuman levels.
               </p>
               
@@ -152,7 +152,7 @@ export default function HomePage() {
                     <SearchIcon className="h-4 w-4" />
                     Search Results
                   </div>
-                  <h1 className="text-3xl font-headline font-black">
+                  <h1 className="text-2xl font-headline font-black">
                     Ainexa Intelligence for <span className="brand-text-gradient italic">"{q}"</span>
                   </h1>
                   <p className="text-muted-foreground font-medium">
@@ -261,7 +261,7 @@ export default function HomePage() {
               <section id="trending" className="py-16">
                 <div className="flex items-center justify-between mb-12 pb-6 border-b">
                   <div className="space-y-1">
-                    <h2 className="text-4xl font-headline font-black flex items-center gap-3">
+                    <h2 className="text-3xl font-headline font-black flex items-center gap-3">
                       <TrendingUp className="h-8 w-8 text-primary" />
                       Featured Tools
                     </h2>
@@ -286,7 +286,7 @@ export default function HomePage() {
 
               <section className="py-24 bg-muted/30 -mx-4 px-4 rounded-[4rem] border border-primary/10 mb-20">
                 <div className="text-center mb-16">
-                  <h2 className="text-5xl font-headline font-black mb-6 leading-tight">Elite Tools for <span className="brand-text-gradient italic">Your Career</span></h2>
+                  <h2 className="text-4xl font-headline font-black mb-6 leading-tight">Elite Tools for <span className="brand-text-gradient italic">Your Career</span></h2>
                   <p className="text-muted-foreground max-w-2xl mx-auto text-xl font-medium">
                     Every profession is being transformed. We've mapped the top 1% of AI intelligence specifically for your professional domain.
                   </p>

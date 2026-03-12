@@ -1,4 +1,3 @@
-
 import { getToolBySlug, getTrendingTools } from "@/lib/db";
 import { Navbar } from "@/components/Navbar";
 import { AdPlacement } from "@/components/AdPlacement";
@@ -78,7 +77,7 @@ export default async function ToolDetailPage({ params }: Props) {
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1 container mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl font-black mb-4">Tool Not Found</h1>
+          <h1 className="text-3xl font-black mb-4">Tool Not Found</h1>
           <p className="text-muted-foreground mb-8">We couldn't find details for "{slug}". It might be too new or private.</p>
           <Button asChild><Link href="/">Return to Directory</Link></Button>
         </main>
@@ -129,7 +128,7 @@ export default async function ToolDetailPage({ params }: Props) {
           <div className="mb-8 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl p-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
             <Globe className="h-5 w-5 shrink-0" />
             <p className="text-sm font-medium">
-              This profile was generated in real-time by <strong>AI Tool Scout Intelligence</strong> as it's not currently in our local verified directory.
+              This profile was generated in real-time by <strong>Ainexa Intelligence Scout</strong> as it's not currently in our local verified directory.
             </p>
           </div>
         )}
@@ -153,14 +152,14 @@ export default async function ToolDetailPage({ params }: Props) {
                     </div>
                     <div className="space-y-4 flex-1">
                       <div className="flex flex-wrap items-center gap-3">
-                        <h1 className="text-3xl md:text-5xl font-headline font-black tracking-tight">{toolData.name}</h1>
+                        <h1 className="text-2xl md:text-4xl font-headline font-black tracking-tight">{toolData.name}</h1>
                         <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-sm px-3">{toolData.pricingModel}</Badge>
                         <div className="flex items-center gap-1 text-amber-500 font-bold bg-amber-50 px-3 py-1 rounded-xl border border-amber-100">
                           <Star className="h-4 w-4 fill-current" />
                           {toolData.rating}
                         </div>
                       </div>
-                      <p className="text-xl md:text-2xl text-muted-foreground font-medium leading-tight">{toolData.tagline}</p>
+                      <p className="text-lg md:text-xl text-muted-foreground font-medium leading-tight">{toolData.tagline}</p>
                       <div className="flex flex-wrap gap-4 pt-4">
                         <Button size="lg" className="rounded-full px-10 bg-primary shadow-xl shadow-primary/20 hover:scale-105 transition-transform" asChild>
                           <a href={toolData.websiteUrl} target="_blank" rel="noopener noreferrer" className="gap-2">
@@ -185,14 +184,14 @@ export default async function ToolDetailPage({ params }: Props) {
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <Sparkles className="h-6 w-6 text-primary" />
                     </div>
-                    <h2 className="text-2xl font-bold m-0">In-Depth Analysis</h2>
+                    <h2 className="text-xl font-bold m-0">In-Depth Analysis</h2>
                   </div>
                   <div className="text-lg leading-relaxed text-muted-foreground whitespace-pre-line">
                     {toolData.description}
                     
                     <div className="mt-12 space-y-8 text-base">
                       <div className="bg-muted/30 rounded-2xl p-8 border">
-                        <h3 className="text-foreground text-xl font-bold mb-4">Core Capabilities</h3>
+                        <h3 className="text-foreground text-lg font-bold mb-4">Core Capabilities</h3>
                         <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0">
                           {toolData.features.map((feature, i) => (
                             <li key={i} className="flex gap-3 items-start bg-background border p-4 rounded-xl shadow-sm">
@@ -235,7 +234,7 @@ export default async function ToolDetailPage({ params }: Props) {
                       </div>
 
                       <div className="pt-8 border-t">
-                        <h3 className="text-foreground text-xl font-bold mb-4">Professional Verdict</h3>
+                        <h3 className="text-foreground text-lg font-bold mb-4">Professional Verdict</h3>
                         <p className="italic leading-relaxed">
                           Based on our {isAiGenerated ? 'AI research' : 'editorial review'}, {toolData.name} is a high-impact solution for professionals working in {toolData.workCategories.join(' and ')}. 
                           Its {toolData.pricingModel} model offers flexibility for teams of various sizes. We recommend it for users specifically looking for {toolData.features[0].toLowerCase()} and {toolData.features[1].toLowerCase()}.
@@ -251,7 +250,7 @@ export default async function ToolDetailPage({ params }: Props) {
             
             {/* Similar Tools */}
             <section className="py-10">
-              <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+              <h2 className="text-xl font-bold mb-8 flex items-center gap-2">
                 Discover More Alternatives
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -265,7 +264,7 @@ export default async function ToolDetailPage({ params }: Props) {
           {/* Sidebar */}
           <aside className="lg:col-span-4 space-y-8">
             <div className="bg-card border rounded-3xl p-8 shadow-sm sticky top-24">
-              <h3 className="font-bold text-xl mb-6">Specifications</h3>
+              <h3 className="font-bold text-lg mb-6">Specifications</h3>
               <div className="space-y-6">
                 <div className="flex justify-between items-center py-2 border-b border-dashed">
                   <span className="text-muted-foreground">Access Model</span>

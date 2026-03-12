@@ -98,7 +98,7 @@ export default function AdminDashboard() {
               <ShieldCheck className="h-10 w-10 text-primary" />
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-3xl font-black">Moderator Login</CardTitle>
+              <CardTitle className="text-2xl font-black">Moderator Login</CardTitle>
               <CardDescription className="text-muted-foreground font-medium">Enter your credentials to manage the AI directory.</CardDescription>
             </div>
           </CardHeader>
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
           <Lock className="h-10 w-10 text-destructive" />
         </div>
         <div className="space-y-4 max-w-md">
-          <h1 className="text-3xl font-black">Access Denied</h1>
+          <h1 className="text-2xl font-black">Access Denied</h1>
           <p className="text-muted-foreground font-medium">
             Your account <strong>{user.email}</strong> is not authorized to access this dashboard.
           </p>
@@ -256,7 +256,7 @@ export default function AdminDashboard() {
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b pb-8">
             <div className="space-y-1">
-              <h1 className="text-4xl font-headline font-black flex items-center gap-3">
+              <h1 className="text-3xl font-headline font-black flex items-center gap-3">
                 <ShieldCheck className="h-10 w-10 text-primary" />
                 Moderation Hub
               </h1>
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                           <div className="space-y-2">
                             <div className="flex items-center gap-3">
-                              <CardTitle className="text-3xl font-black">{sub.name}</CardTitle>
+                              <CardTitle className="text-2xl font-black">{sub.name}</CardTitle>
                               <Badge variant="outline" className="font-bold border-primary/20 text-primary">{sub.pricingModel}</Badge>
                             </div>
                             <p className="text-muted-foreground font-medium italic text-lg">"{sub.shortDescription}"</p>
@@ -384,7 +384,7 @@ export default function AdminDashboard() {
                  <CardHeader className="bg-primary/5 p-8 border-b">
                    <div className="flex items-center gap-3">
                      <History className="h-6 w-6 text-primary" />
-                     <CardTitle>Global Activity Log</CardTitle>
+                     <CardTitle className="text-xl">Global Activity Log</CardTitle>
                    </div>
                    <CardDescription className="text-base">Real-time record of all administrative actions.</CardDescription>
                  </CardHeader>
