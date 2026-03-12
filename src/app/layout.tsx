@@ -1,4 +1,3 @@
-
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -16,7 +15,7 @@ const inter = Inter({
 });
 
 export const viewport: Viewport = {
-  themeColor: '#4f46e5',
+  themeColor: '#7c3aed',
   width: 'device-width',
   initialScale: 1,
 };
@@ -24,14 +23,14 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://aitoolscompus.vercel.app'),
   title: {
-    default: 'AI Tool Scout - Discover the Best AI Tools by Profession',
-    template: '%s | AI Tool Scout'
+    default: 'Ainexa - Discover the Best AI Tools for Your Profession',
+    template: '%s | Ainexa'
   },
-  description: 'Explore thousands of AI tools categorized by profession and work type. Compare features, pricing, and performance in one place.',
-  keywords: ['AI tools', 'artificial intelligence', 'directory', 'comparison', 'productivity', 'software', 'machine learning'],
-  authors: [{ name: 'AI Tool Scout Team' }],
-  creator: 'AI Tool Scout',
-  publisher: 'AI Tool Scout',
+  description: 'Explore the global AI ecosystem with Ainexa. Discover thousands of curated AI tools categorized by profession and work type.',
+  keywords: ['Ainexa', 'AI tools', 'artificial intelligence', 'directory', 'comparison', 'productivity', 'software'],
+  authors: [{ name: 'Ainexa Team' }],
+  creator: 'Ainexa',
+  publisher: 'Ainexa',
   robots: {
     index: true,
     follow: true,
@@ -46,23 +45,23 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://aitoolscompus.vercel.app',
-    siteName: 'AI Tool Scout',
-    title: 'AI Tool Scout - Global Intelligence for Professional Discovery',
-    description: 'The world\'s most comprehensive directory of AI tools researched by Gemini AI.',
+    siteName: 'Ainexa',
+    title: 'Ainexa - Global Intelligence for Professional Discovery',
+    description: 'The world\'s most comprehensive directory of AI tools researched by Ainexa AI.',
     images: [
       {
-        url: 'https://picsum.photos/seed/ai-scout-og/1200/630',
+        url: 'https://picsum.photos/seed/ainexa-og/1200/630',
         width: 1200,
         height: 630,
-        alt: 'AI Tool Scout - Professional AI Directory',
+        alt: 'Ainexa - Professional AI Directory',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Tool Scout - Find Your Next AI Tool',
+    title: 'Ainexa - Find Your Next AI Tool',
     description: 'Expert-curated AI directory with side-by-side comparison engine.',
-    images: ['https://picsum.photos/seed/ai-scout-twitter/1200/630'],
+    images: ['https://picsum.photos/seed/ainexa-twitter/1200/630'],
   },
 };
 

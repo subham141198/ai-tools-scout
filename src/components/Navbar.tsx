@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -14,7 +13,7 @@ import { PROFESSIONS } from "@/lib/db";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { aiSuggestions } from "@/ai/flows/ai-suggestion-flow";
-import { useClickAway } from "react-use"; // We can use a simple ref check instead of adding a new lib
+import { AinexaLogo } from "./AinexaLogo";
 
 export function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,7 +26,6 @@ export function Navbar() {
   const searchParams = useSearchParams();
   const toolsCount = searchParams.get('tools')?.split(',').filter(Boolean).length || 0;
 
-  // Debounced suggestion fetching
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (searchQuery.trim().length >= 2 && showSuggestions) {
@@ -48,7 +46,6 @@ export function Navbar() {
     return () => clearTimeout(timer);
   }, [searchQuery, showSuggestions]);
 
-  // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -76,13 +73,8 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-bold text-xl shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
-            TS
-          </div>
-          <span className="font-headline font-bold text-xl tracking-tight hidden sm:block">
-            AI Tool <span className="text-primary">Scout</span>
-          </span>
+        <Link href="/" className="group">
+          <AinexaLogo className="hover:scale-105 transition-transform" />
         </Link>
 
         <div ref={searchRef} className="flex-1 max-w-md relative hidden md:block">
@@ -104,12 +96,11 @@ export function Navbar() {
             )}
           </form>
 
-          {/* Suggestions Dropdown */}
           {showSuggestions && (suggestions.length > 0 || isSuggesting) && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-card border rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="p-2 border-b bg-muted/30 flex items-center gap-2 px-4">
                 <Sparkles className="h-3 w-3 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">AI Suggestions (Llama 3)</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">AI Suggestions</span>
               </div>
               <div className="p-1">
                 {suggestions.map((s, i) => (
@@ -146,9 +137,9 @@ export function Navbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="outline" size="sm" asChild className="hidden sm:flex gap-2 relative">
+          <Button variant="outline" size="sm" asChild className="hidden sm:flex gap-2 relative border-primary/20 hover:bg-primary/5">
             <Link href={toolsCount > 0 ? `/compare?tools=${searchParams.get('tools')}` : '/compare'}>
-              <LayoutDashboard className="h-4 w-4" />
+              <LayoutDashboard className="h-4 w-4 text-primary" />
               Compare
               {toolsCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-in zoom-in">
@@ -158,7 +149,7 @@ export function Navbar() {
             </Link>
           </Button>
 
-          <Button size="sm" asChild className="gap-2 bg-primary hover:bg-primary/90">
+          <Button size="sm" asChild className="gap-2 bg-primary hover:bg-primary/90 shadow-md">
             <Link href="/submit-tool">
               <Plus className="h-4 w-4" />
               Submit
