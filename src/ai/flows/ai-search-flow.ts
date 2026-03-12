@@ -66,6 +66,10 @@ const aiSearchFlow = ai.defineFlow(
   async (input) => {
     const { output } = await aiSearchPrompt(input);
     if (!output) throw new Error('AI failed to generate search results.');
-    return output;
+    return {
+      recommendedTools: [],
+      aiExplanation: '',
+      ...output,
+    };
   }
 );
