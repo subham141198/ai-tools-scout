@@ -95,7 +95,6 @@ const aiToolDetailsFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await aiToolDetailsPrompt(input);
-    console.log(output);
     if (!output || !output.name || !output.tagline || !output.description || !output.websiteUrl || !output.pricingModel || !output.rating || !output.features || !output.pros || !output.cons || !output.professionCategories || !output.workCategories || !output.logoUrl) throw new Error('AI could not generate tool details.');
     return output;
   }
