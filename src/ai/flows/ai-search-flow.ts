@@ -11,8 +11,8 @@ const AiSearchResultSchema = z.object({
   name: z.string().describe('The name of the AI tool.'),
   tagline: z.string().describe('A short, catchy tagline or hook.'),
   description: z.string().describe('A detailed description of what the tool does and its main benefits.'),
-  websiteUrl: z.string().url().describe('The official website URL for the tool.'),
-  pricingModel: z.enum(['Free', 'Paid', 'Freemium', 'Open Source']).describe('The pricing model of the tool.'),
+  websiteUrl: z.string().describe('The official website URL for the tool.'),
+  pricingModel: z.string().describe('The pricing model of the tool (e.g. Free, Paid, Freemium, Open Source).'),
   professionCategories: z.array(z.string()).describe('Categories or professions this tool is best for.'),
   workCategories: z.array(z.string()).describe('Types of work this tool helps with.'),
   rating: z.number().describe('An estimated or average user rating (0-5).'),
@@ -66,10 +66,6 @@ const aiSearchFlow = ai.defineFlow(
   async (input) => {
     const { output } = await aiSearchPrompt(input);
     if (!output) throw new Error('AI failed to generate search results.');
-    return {
-      recommendedTools: [],
-      aiExplanation: '',
-      ...output,
-    };
+    return output;
   }
 );

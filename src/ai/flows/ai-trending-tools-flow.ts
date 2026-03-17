@@ -7,27 +7,64 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const TrendingToolSchema = z.object({
-  id: z.string().describe('Unique slug for the tool.'),
-  name: z.string().describe('Name of the AI tool.'),
-  tagline: z.string().describe('Catchy one-liner.'),
-  description: z.string().describe('Brief description.'),
-  websiteUrl: z.string().url().describe('Official website.'),
-  pricingModel: z.enum(['Free', 'Paid', 'Freemium', 'Open Source']),
-  rating: z.number().describe('Estimated user rating (0-5).'),
-  logoUrl: z.string().describe('Placeholder logo URL.'),
-  professionCategories: z.array(z.string()),
-  workCategories: z.array(z.string()),
+  id: z
+    .string()
+    .describe("Unique slug identifier for the AI tool"),
+
+  name: z
+    .string()
+    .describe("Name of the AI tool"),
+
+  tagline: z
+    .string()
+    .describe("Short catchy one-line tagline"),
+
+  description: z
+    .string()
+    .describe("Short description of what the AI tool does"),
+
+  websiteUrl: z
+    .string()
+    .url()
+    .describe("Official website URL"),
+
+  pricingModel: z
+    .enum(["free", "freemium", "paid", "subscription", "enterprise"])
+    .describe("Pricing model of the tool"),
+
+  rating: z
+    .number()
+    .min(0)
+    .max(5)
+    .describe("Estimated user rating from 0 to 5"),
+
+  logoUrl: z
+    .string()
+    .url()
+    .describe("URL of the tool logo"),
+
+  professionCategories: z
+    .array(z.string())
+    .min(1)
+    .describe("Professions that benefit from this tool"),
+
+  workCategories: z
+    .array(z.string())
+    .min(1)
+    .describe("Work tasks this AI tool helps with")
 });
 
 const AiTrendingToolsOutputSchema = z.object({
   tools: z
     .array(TrendingToolSchema)
-    .describe('List of trending AI tools found globally.'),
+    .min(1)
+    .max(10)
+    .describe("List of trending AI tools currently popular"),
+
   marketSummary: z
     .string()
-    .describe('A brief summary of current AI market trends.'),
+    .describe("Short summary of global AI tool trends")
 });
-
 export type AiTrendingToolsOutput = z.infer<typeof AiTrendingToolsOutputSchema>;
 
 export async function aiTrendingTools(): Promise<AiTrendingToolsOutput> {
@@ -38,17 +75,34 @@ const aiTrendingToolsPrompt = ai.definePrompt({
   name: 'aiTrendingToolsPrompt',
   model: 'groq/llama-3.1-8b-instant',
   output: { schema: AiTrendingToolsOutputSchema },
-  prompt: `You are a world-class AI market researcher for "Ainexa". Identify 6 of the most trending AI tools available globally right now.
+  prompt: `
+You are a world-class AI market researcher for "Ainexa".
 
-For each tool, provide:
-1. Real name and tagline.
-2. Short description.
-3. Official URL.
-4. Pricing model.
-5. A placeholder logo URL: 'https://picsum.photos/seed/<slug>/400/400'.
-6. Target professions and work categories.
+Return ONLY valid JSON matching the provided schema.
 
-Include a "marketSummary" explaining these trends.`,
+Find exactly 6 trending AI tools currently popular worldwide.
+
+Rules:
+- Use real AI tools.
+- Do not include explanations.
+- Return valid JSON only.
+- Ensure the "tools" array exists and contains exactly 6 items.
+
+For each tool include:
+- id (slug format like "chatgpt")
+- name
+- tagline
+- description
+- websiteUrl
+- pricingModel (free | freemium | paid | subscription | enterprise)
+- rating (0-5)
+- logoUrl using: https://picsum.photos/seed/<slug>/400/400
+- professionCategories
+- workCategories
+
+Also include:
+"marketSummary" explaining current AI market trends.
+`,
 });
 
 const aiTrendingToolsFlow = ai.defineFlow(
@@ -59,7 +113,8 @@ const aiTrendingToolsFlow = ai.defineFlow(
   },
   async () => {
     const { output } = await aiTrendingToolsPrompt();
-    if (!output) throw new Error('AI could not identify trending tools.');
+    console.log(output);
+    if (!output || !output.tools || output.tools.length === 0) throw new Error('AI could not identify trending tools.');
     return output;
   }
 );

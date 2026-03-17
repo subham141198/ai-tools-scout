@@ -63,28 +63,111 @@ const aiSeoContentGeneratorPrompt = ai.definePrompt({
   model: 'groq/llama-3.1-8b-instant',
   input: { schema: AiSeoContentGeneratorInputSchema },
   output: { schema: AiSeoContentGeneratorOutputSchema },
-  prompt: `You are an expert SEO content writer. Generate high-quality SEO content for an AI platform.
+  prompt: `
+You are a professional SEO content writer for an AI platform called "Ainexa".
 
-Your task is to generate:
-1. An SEO-optimized Title (50-60 characters).
-2. An SEO-optimized Meta Description (150-160 characters).
-3. A Long Description of at least 800 words.
+Your task is to generate structured SEO content.
 
-{{#if toolName}}
-Generate content for AI Tool: {{{toolName}}}
-{{#if toolShortDescription}}Overview: {{{toolShortDescription}}}{{/if}}
+Return ONLY valid JSON that strictly matches the provided schema.
+Do NOT include explanations, markdown, or text outside JSON.
+
+=====================
+OUTPUT REQUIREMENTS
+=====================
+
+1. seoTitle:
+- 50–60 characters
+- Clear, keyword-rich, engaging
+
+2. metaDescription:
+- 150–160 characters
+- Include primary keyword naturally
+- Action-oriented and informative
+
+3. longDescription:
+- Minimum 800 words
+- Well-structured, SEO optimized
+- Use natural keyword repetition
+- Write in clear paragraphs (no markdown)
+- Include:
+  - introduction
+  - key benefits
+  - use cases
+  - features (if tool)
+  - real-world applications
+  - conclusion
+
+=====================
+CONTEXT-SPECIFIC RULES
+=====================
+
+{{#if (eq context "tool")}}
+Generate content for AI Tool: "{{toolName}}"
+
+{{#if toolShortDescription}}
+Context: {{toolShortDescription}}
 {{/if}}
 
-{{#if professionName}}
-Generate content for Profession: {{{professionName}}}
+{{#if keyFeatures}}
+Key Features:
+{{#each keyFeatures}}- {{this}}
+{{/each}}
 {{/if}}
 
-{{#if workCategoryName}}
-Generate content for Work Category: {{{workCategoryName}}}
+{{#if competitors}}
+Competitors:
+{{#each competitors}}- {{this}}
+{{/each}}
 {{/if}}
 
-Ensure the long description is highly detailed and informative.
-`,
+Focus on:
+- What the tool does
+- Unique advantages
+- Real-world usage
+- Comparison with alternatives
+{{/if}}
+
+{{#if (eq context "profession")}}
+Generate content for Profession: "{{professionName}}"
+
+{{#if relevantTasks}}
+Common Tasks:
+{{#each relevantTasks}}- {{this}}
+{{/each}}
+{{/if}}
+
+Focus on:
+- Role responsibilities
+- Challenges
+- How AI tools improve productivity
+{{/if}}
+
+{{#if (eq context "workCategory")}}
+Generate content for Work Category: "{{workCategoryName}}"
+
+{{#if useCases}}
+Use Cases:
+{{#each useCases}}- {{this}}
+{{/each}}
+{{/if}}
+
+Focus on:
+- What this work involves
+- Where AI is used
+- Benefits of automation
+{{/if}}
+
+=====================
+IMPORTANT RULES
+=====================
+
+- Always return ALL fields: seoTitle, metaDescription, longDescription
+- Do NOT skip any field
+- Do NOT shorten the longDescription
+- Ensure longDescription is at least 800 words
+- Output must be valid JSON only
+
+`
 });
 
 const aiSeoContentGeneratorFlow = ai.defineFlow(

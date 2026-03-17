@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview This file defines a Genkit flow for generating comprehensive 
+ * @fileOverview This file defines a Genkit flow for generating comprehensive
  * details for any AI tool.
  */
 
@@ -13,17 +13,34 @@ const AiToolDetailsInputSchema = z.object({
 
 const AiToolDetailsOutputSchema = z.object({
   name: z.string(),
+
   tagline: z.string(),
+
   description: z.string(),
+
   websiteUrl: z.string().url(),
-  pricingModel: z.enum(['Free', 'Paid', 'Freemium', 'Open Source']),
-  rating: z.number(),
-  features: z.array(z.string()),
-  pros: z.array(z.string()),
-  cons: z.array(z.string()),
-  professionCategories: z.array(z.string()),
-  workCategories: z.array(z.string()),
-  logoUrl: z.string(),
+
+  pricingModel: z.enum([
+    "free",
+    "freemium",
+    "paid",
+    "subscription",
+    "enterprise"
+  ]),
+
+  rating: z.number().min(0).max(5),
+
+  features: z.array(z.string()).min(3),
+
+  pros: z.array(z.string()).min(1),
+
+  cons: z.array(z.string()).min(1),
+
+  professionCategories: z.array(z.string()).min(1),
+
+  workCategories: z.array(z.string()).min(1),
+
+  logoUrl: z.string().url()
 });
 
 export type AiToolDetailsOutput = z.infer<typeof AiToolDetailsOutputSchema>;
@@ -37,19 +54,37 @@ const aiToolDetailsPrompt = ai.definePrompt({
   model: 'groq/llama-3.1-8b-instant',
   input: { schema: AiToolDetailsInputSchema },
   output: { schema: AiToolDetailsOutputSchema },
-  prompt: `You are an expert tech researcher for "Ainexa". Provide deep details about the AI tool: "{{slug}}"
+  prompt: `
+You are an expert AI technology researcher working for the platform "Ainexa".
 
-Include:
-1. The real name and tagline.
-2. A comprehensive description.
-3. The official website URL.
-4. Specific key features (at least 5).
-5. Honest pros and cons.
-6. Target professions and work categories.
-7. An estimated user rating (0-5).
-8. A logo placeholder URL: 'https://picsum.photos/seed/{{slug}}/400/400'.
+Research the AI tool identified by the slug: "{{slug}}".
 
-Format the response as a structured JSON object.`,
+Return ONLY valid JSON that strictly matches the provided schema.
+Do NOT include explanations, markdown, or extra text.
+
+Rules:
+- Use real and accurate information when possible.
+- If the exact tool cannot be found, infer reasonable details based on the slug.
+- Ensure all fields required by the schema are present.
+- Arrays must contain at least one item.
+
+Fields to generate:
+- name: Full product name
+- tagline: Short one-line slogan
+- description: Detailed explanation of what the tool does
+- websiteUrl: Official website URL
+- pricingModel: One of "free", "freemium", "paid", "subscription", or "enterprise"
+- rating: Estimated rating between 0 and 5
+- features: At least 5 key product features
+- pros: Honest advantages of the tool
+- cons: Honest limitations or drawbacks
+- professionCategories: Professions that benefit from the tool
+- workCategories: Tasks or work types the tool helps with
+- logoUrl: Use the placeholder URL format:
+  https://picsum.photos/seed/{{slug}}/400/400
+
+Return JSON only.
+`
 });
 
 const aiToolDetailsFlow = ai.defineFlow(
@@ -60,7 +95,8 @@ const aiToolDetailsFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await aiToolDetailsPrompt(input);
-    if (!output) throw new Error('AI could not generate tool details.');
+    console.log(output);
+    if (!output || !output.name || !output.tagline || !output.description || !output.websiteUrl || !output.pricingModel || !output.rating || !output.features || !output.pros || !output.cons || !output.professionCategories || !output.workCategories || !output.logoUrl) throw new Error('AI could not generate tool details.');
     return output;
   }
 );
